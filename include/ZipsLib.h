@@ -18,6 +18,8 @@
 #define LOG(...)
 #endif
 
+#define LED_PIN 25
+
 #if LOOP_PROGRAM
 #ifndef _PICO_STDLIB_H
 #include <pico/stdlib.h>
