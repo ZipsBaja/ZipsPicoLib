@@ -3,15 +3,6 @@
 
 #pragma once
 
-#ifdef _MSC_VER
-#define ALIGNED(x) __declspec(align(x))
-#elif defined(__GNUC__)
-#define ALIGNED(x) __attribute__((aligned(x)))
-#else
-#define ALIGNED(x)
-#warning "Invalid compiler for alignment attribute"
-#endif
-
 #ifdef __ARM_NEON
 #define USING_INTRIN 1
 #include <arm_neon.h>
@@ -34,4 +25,17 @@ typedef __m256d simd_float64x4_t;
 #include <math.h>
 #define USING_INTRIN 0
 #pragma message("Skipping intrinsics and using standard instructions.")
+#endif
+
+#if USING_INTRIN
+#ifdef _MSC_VER
+#define ALIGNED(x) __declspec(align(x))
+#elif defined(__GNUC__)
+#define ALIGNED(x) __attribute__((aligned(x)))
+#else
+#define ALIGNED(x)
+#warning "Invalid compiler for alignment attribute"
+#endif
+#else
+#define ALIGNED(x)
 #endif
