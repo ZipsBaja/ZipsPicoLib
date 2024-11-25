@@ -2,6 +2,8 @@
 
 #include <stdint.h>
 
+#include <ZipsLib.h>
+
 namespace uazips
 {
 
@@ -28,6 +30,23 @@ namespace uazips
         inline ~OrderedList()
         {
             delete[] array;
+        }
+
+        inline void Malloc(size_t capacity, bool empty = false)
+        {
+            if (empty)
+            {
+                delete[] array;
+                array = new T[capacity];
+                if (!array)
+                    THROW("Out of memory.");
+                return;
+            }
+            T* temp = new T[capacity];
+            for (size_t i = 0; i < arr_size; i++)
+                temp[i] = array[i]
+            delete[] array;
+            array = temp;
         }
 
         inline void Push(T data)
@@ -59,6 +78,67 @@ namespace uazips
             if (index < arr_size)
                 return array[index];
             return reinterpret_cast<T>(-1);
+        }
+
+        /*
+        * Returns the first index of the data that is inserted.
+        * @param data The object to find the index of.
+        */
+        inline size_t FindFirstOf(T data) const
+        {
+            for (size_t i = 0; i < arr_size; i++)
+            {
+                if (array[i] == data)
+                    return i;
+            }
+            return -1;
+        }
+
+        /*
+        * Returns the last index of the data that is inserted.
+        * @param data The object to find the index of.
+        */
+        inline size_t FindLastOf(T data) const
+        {
+            for (size_t i = arr_size; i > 0; i--)
+            {
+                if (array[i] == data)
+                    return i;
+            }
+            return -1;
+        }
+
+        /*
+        * Returns the indecies of the data that is inserted.
+        * @param data The object to find the index of.
+        */
+        inline const OrderedList<size_t>& Find(T data) const
+        {
+            OrderedList<size_t> indecies;
+            for (size_t i = 0; i < arr_size; i++)
+            {
+                if (array[i] == data)
+                    indecies.Push(i);
+            }
+            return indecies;
+        }
+
+        /*
+        * This function is used to return the data represented as a raw pointer array.
+        * This is not safe! Data can be destroyed if list destructor is called, or
+        * when copying the array, you must call `delete[]` when done using it!
+        * @param create_new Choose whether to copy to a new array or use original.
+        * @param by_capacity Choose to copy the entire capacity of the array instead
+        * of the used entries.
+        */
+        inline T* ToArray(bool create_new = true, bool by_capacity = false) const
+        {
+            if (!create_new)
+                return array;
+            size_t ret_size = by_capacity ? arr_capacity : arr_size;
+            T* ret = new T[ret_size];
+            memcpy(ret, array, sizeof(T) * ret_size)
+            return ret;
         }
 
         inline T operator[](size_t index)
