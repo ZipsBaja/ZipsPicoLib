@@ -53,7 +53,7 @@
 #define PICO_LED_TOGGLE() cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN, !cyw43_arch_gpio_get(CYW43_WL_GPIO_LED_PIN))
 #define PICO_LED_INIT()
 #else
-#warning "Please define a macro for the Pico board type."
+#error "Please define a macro for the Pico board type."
 #endif
 
 #define BEGIN_SETUP() PICO_LED_ON()
