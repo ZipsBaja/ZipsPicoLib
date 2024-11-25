@@ -44,7 +44,7 @@ namespace uazips
             }
             T* temp = new T[capacity];
             for (size_t i = 0; i < arr_size; i++)
-                temp[i] = array[i]
+                temp[i] = array[i];
             delete[] array;
             array = temp;
         }
@@ -137,7 +137,7 @@ namespace uazips
                 return array;
             size_t ret_size = by_capacity ? arr_capacity : arr_size;
             T* ret = new T[ret_size];
-            memcpy(ret, array, sizeof(T) * ret_size)
+            memcpy(ret, array, sizeof(T) * ret_size);
             return ret;
         }
 
