@@ -2,18 +2,12 @@
 
 #pragma once
 
-#ifndef _STDARG_H
 #include <stdarg.h>
-#endif
-
-#ifndef _PICO_STDLIB_H
 #include <pico/stdlib.h>
-#endif
 
 #ifdef USING_PICO_W
-#ifndef _PICO_CYW43_ARCH_H
 #include <pico/cyw43_arch.h>
-#endif
+#include <pico_w.h>
 #endif
 
 // Change these to zero or one depending on the use case!
@@ -46,14 +40,14 @@
 #define PICO_LED_OFF() gpio_put(LED_PIN, 0)
 #define PICO_LED_TOGGLE() gpio_put(LED_PIN, !gpio_get(LED_PIN))
 #define PICO_LED_INIT() gpio_init(LED_PIN); gpio_set_dir(LED_PIN, GPIO_OUT)
-#elif defined(USING_PICO_W)
+#elif defined(USING_PICO_W) || defined(USING_PICO_2_W)
 #define LED_PIN 0
 #define PICO_LED_ON() cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN, 1)
 #define PICO_LED_OFF() cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN, 0)
 #define PICO_LED_TOGGLE() cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN, !cyw43_arch_gpio_get(CYW43_WL_GPIO_LED_PIN))
 #define PICO_LED_INIT()
 #else
-#error "Please define a macro for the Pico board type."
+#error "Please define a macro for the Pico board type in your CMakeLists.txt file."
 #endif
 
 #define BEGIN_SETUP() PICO_LED_ON()
