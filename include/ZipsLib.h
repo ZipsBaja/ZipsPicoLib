@@ -5,7 +5,7 @@
 #include <stdarg.h>
 #include <pico/stdlib.h>
 
-#ifdef USING_PICO_W
+#if defined(USING_PICO_W) || defined(USING_PICO_2_W)
 #include <pico/cyw43_arch.h>
 #include <pico_w.h>
 #endif
