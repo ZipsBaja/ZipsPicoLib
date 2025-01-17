@@ -80,7 +80,7 @@ static int zl_are_libraries_initialized = 0;
     { \
         PICO_LED_ON(); \
         sleep_ms(20); \
-        PICO_LED_OFF; \
+        PICO_LED_OFF(); \
         sleep_ms(20); \
     } \
     LOG(__VA_ARGS__)
