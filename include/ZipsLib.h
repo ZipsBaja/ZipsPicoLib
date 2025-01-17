@@ -53,7 +53,12 @@
 #error "Please define a macro for the Pico board type in your CMakeLists.txt file."
 #endif
 
-#define BEGIN_SETUP() PICO_LED_ON()
+// Used only for setup process.
+static int zl_are_libraries_initialized = 0;
+
+#define BEGIN_SETUP() if (!zl_are_libraries_initialized) \
+    init_libs(); \
+    PICO_LED_ON() 
 #define BEGIN_LOOP() PICO_LED_OFF()
 
 #if LOOP_PROGRAM_ON_ERROR
@@ -70,6 +75,16 @@
 #define THROW(...) LOG(__VA_ARGS__); return -1
 #endif
 
+#define WARN(...) \
+    for (int i = 0; i < 2; i++) \
+    { \
+        PICO_LED_ON(); \
+        sleep_ms(20); \
+        PICO_LED_OFF; \
+        sleep_ms(20); \
+    } \
+    LOG(__VA_ARGS__)
+
 static inline void init_libs()
 {
 #if USING_PRINT
@@ -83,6 +98,7 @@ static inline void init_libs()
 #if PREINIT_LED
     PICO_LED_INIT();
 #endif
+    zl_are_libraries_initialized = 1;
 }
 
 #define resume_on(func) while (1) \
