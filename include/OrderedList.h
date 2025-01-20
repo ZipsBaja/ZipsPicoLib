@@ -6,7 +6,10 @@
 
 namespace uazips
 {
-
+    /*
+    * A stack-based dynamic array structure. This class is not responsible
+    * for handling your pointers!
+    */
     template<typename T>
     class OrderedList
     {
@@ -32,8 +35,60 @@ namespace uazips
             delete[] array;
         }
 
+        class Iterator
+        {
+        private:
+            T* current_elem;
+        public:
+            inline Iterator(T* ptr) : current_elem(ptr)
+            {
+            }
+
+            inline Iterator& operator++()
+            {
+                current_elem++;
+                return *this;
+            }
+
+            inline Iterator& operator--()
+            {
+                current_elem--;
+                return *this;
+            }
+
+            inline bool operator==(const Iterator& other) const
+            {
+                return  current_elem = other.current_elem;
+            }
+
+            inline bool operator!=(const Iterator& other) const
+            {
+                return !(*this == other);
+            }
+        };
+
+        inline Iterator begin()
+        {
+            return Iterator(array[0]);
+        }
+
+        inline Iterator end()
+        {
+            return Iterator(array[arr_size]);
+        }
+
+        /*
+        * Allocates slots for entries.
+        * @param capacity The number of entries you wish to allocate.
+        * Minimum value accepted is 1.
+        * The total byte count is done automatically.
+        * @param empty False by default. Clears the list and sets the
+        * capacity to what is specified.
+        */
         inline void Malloc(size_t capacity, bool empty = false)
         {
+            capacity = capacity < 1 ? 1 : capacity;
+            arr_size = arr_size < capacity ? capacity : arr_size;
             if (empty)
             {
                 delete[] array;
@@ -100,7 +155,7 @@ namespace uazips
         */
         inline size_t FindLastOf(T data) const
         {
-            for (size_t i = arr_size; i > 0; i--)
+            for (size_t i = arr_size - 1; i >= 0; i--)
             {
                 if (array[i] == data)
                     return i;
@@ -116,11 +171,43 @@ namespace uazips
         {
             OrderedList<size_t> indecies;
             for (size_t i = 0; i < arr_size; i++)
-            {
                 if (array[i] == data)
                     indecies.Push(i);
-            }
             return indecies;
+        }
+
+        /*
+        * Removes duplicates from the existing list.
+        */
+        inline void RemoveDuplicates()
+        {
+            if (arr_size < 2)
+                return;
+            
+            size_t new_size = arr_size;
+            for (size_t i = 0; i < new_size - 1; i++)
+            {
+                for (size_t j = 0; j < new_size;)
+                {
+                    if (array[i] == array[j])
+                    {
+                        for (size_t k = j; k < new_size - 1; k++)
+                            array[k] = array[k + 1];
+                        new_size--;
+                    }
+                    else
+                        j++;
+                }
+            }
+
+            // Resize array and move data.
+            T* temp = new T[new_size];
+            memcpy(temp, array, new_size * sizeof(T));
+
+            delete[] array;
+            array = temp;
+            arr_size = new_size;
+            arr_capacity = new_size;
         }
 
         /*
@@ -141,11 +228,20 @@ namespace uazips
             return ret;
         }
 
-        inline T operator[](size_t index)
+        inline T operator[](size_t index) const
         {
             return Get(index);
         }
 
+        inline operator T() const
+        {
+            return array[0];
+        }
+
+        /*
+        * Removes the last entry in the list.
+        * Does not change the allocated capacity.
+        */
         inline const T& Pop()
         {
             const T& ret = array[arr_size];
@@ -153,13 +249,33 @@ namespace uazips
             return ret;
         }
 
+        /*
+        * Checks the list to see if an entry exists.
+        */
+        inline bool Exists(T data) const
+        {
+            for (size_t i = 0; i < arr_size; i++)
+                if (array[i] == data)
+                    return true;
+            return false;
+        }
+
+        /*
+        * Removes all entries from the list and resizes the list.
+        */
         inline void Remove(T remove)
         {
-            T* temp = new T[arr_capacity--];
+            if (!Exists(remove))
+                return;
+            size_t rewind = 0;
+            for (size_t i = 0; i < arr_size; i++)
+                if (array[i] == remove)
+                    rewind++;
+            T* temp = new T[arr_capacity -= rewind];
             if (!temp)
                 THROW("Out of memory.");
-            size_t rewind = 0;
-            for (int i = 0; i <= arr_capacity; i++)
+            rewind = 0;
+            for (size_t i = 0; i < arr_capacity + rewind; i++)
             {
                 if (array[i] == remove)
                 {
@@ -171,6 +287,48 @@ namespace uazips
             delete[] array;
             array = temp;
             arr_size -= rewind;
+        }
+
+        /*
+        * Removes the entry at the given position. Resizes the list.
+        */
+        inline void RemoveAt(size_t index)
+        {
+            if (arr_capacity < index)
+                return;
+            T* temp = new T[arr_capacity--];
+            if (!temp)
+                THROW("Out of memory.");
+            size_t found = 0;
+            for (size_t i = 0; i <= arr_capacity; i++)
+            {
+                if (index == i)
+                {
+                    found++;
+                    continue;
+                }
+                temp[i - found] = array[i];
+            }
+            delete[] array;
+            array = temp;
+            arr_size--;
+        }
+
+        /*
+        * Clears the list and keeps the capacity.
+        */
+        inline void Clear()
+        {
+            arr_size = 0;
+        }
+
+        /*
+        * Calls `OrderedList::Malloc(1, true)`.
+        * This function exists out of user-friendlyness.
+        */
+        inline void Reset()
+        {
+            Malloc(1, 1);
         }
 
         inline size_t GetCapacity() const
