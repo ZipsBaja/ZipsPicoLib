@@ -63,7 +63,7 @@ namespace uazips
 
             inline bool operator==(const Iterator& other) const
             {
-                return  current_elem = other.current_elem;
+                return current_elem == other.current_elem;
             }
 
             inline bool operator!=(const Iterator& other) const
