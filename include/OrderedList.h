@@ -44,6 +44,11 @@ namespace uazips
             {
             }
 
+            inline T& operator*() const
+            {
+                return *current_elem;
+            }
+
             inline Iterator& operator++()
             {
                 current_elem++;
