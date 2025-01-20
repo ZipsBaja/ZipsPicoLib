@@ -74,12 +74,12 @@ namespace uazips
 
         inline Iterator begin()
         {
-            return Iterator(array[0]);
+            return Iterator(&array[0]);
         }
 
         inline Iterator end()
         {
-            return Iterator(array[arr_size]);
+            return Iterator(&array[arr_size]);
         }
 
         /*
