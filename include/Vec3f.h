@@ -234,5 +234,18 @@ namespace uazips
 #endif
             return *this;
         }
+
+        inline Vec3f& operator--()
+        {
+            x -= 1.f;
+            y -= 1.f;
+            z -= 1.f;
+            return *this;
+        }
+
+        inline float operator|(const Vec3f& Other) const
+        {
+            return (Other - *this).Length();
+        }
     };
 }
