@@ -1,7 +1,7 @@
 #pragma once
 
 #include <stdint.h>
-
+#include <string.h>
 #include <ZipsLib.h>
 
 namespace uazips
@@ -28,6 +28,26 @@ namespace uazips
             array = new T[cap];
             if (!array)
                 THROW("Out of memory.");
+        }
+
+        /*
+        * Assignment operator.
+        */
+        inline OrderedList& operator=(const OrderedList& other)
+        {
+            arr_size = other.arr_size;
+            arr_capacity = arr_capacity;
+            delete[] array;
+            memcpy(array, other.array, sizeof(T) * arr_size);
+            return *this;
+        }
+
+        /*
+        * Copy constructor.
+        */
+        inline OrderedList(const OrderedList& other) : arr_size(other.arr_size), arr_capacity(other.arr_capacity)
+        {
+            memcpy(array, other.array, sizeof(T) * other.arr_size);
         }
 
         inline ~OrderedList()
