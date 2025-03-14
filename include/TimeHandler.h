@@ -30,7 +30,7 @@ namespace uazips
             return TimeNow - TimeWhenCreated;
         }
         
-        inline operator float() const
+        inline operator uint64_t() const
         {
             return DeltaTime;
         }
