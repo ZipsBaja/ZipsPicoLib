@@ -25,9 +25,14 @@ namespace uazips
             TimeThen = TimeNow;
         }
 
-        inline uint64_t GetElapsed()
+        inline uint64_t GetElapsed() const
         {
             return TimeNow - TimeWhenCreated;
+        }
+        
+        inline operator float() const
+        {
+            return DeltaTime;
         }
     };
 
