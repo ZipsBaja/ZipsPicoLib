@@ -28,7 +28,6 @@
 //
 
 #if USING_PRINT
-#include <pico/stdio.h>
 #include <stdio.h>
 #define LOG(...) printf(__VA_ARGS__)
 #define LOGCHAR(v) putchar(v)

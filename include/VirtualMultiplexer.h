@@ -28,15 +28,20 @@ namespace uazips
         * Constructs a new mutliplexer object.
         * @param pins All of the pins being used by this multiplexer.
         * @param total_pins The number of pins in the previous parameter's array. Use `countof(pins)` or `sizeof(pins)/sizeof(uint8_t)` if the array is stack-allocated.
+        * @param dir The GPIO direction for the pins.
         */
-        inline VirtualMultiplexer(uint8_t pins[], size_t total_pins) : total_pins(total_pins)
+        inline VirtualMultiplexer(uint8_t pins[], size_t total_pins, bool dir = 0) : total_pins(total_pins)
         {
             pins_used = new PinMode[total_pins];
             for (int i = 0; i < total_pins; i++)
             {
                 pins_used[i] = {pins[i], 0};
+                gpio_init(pins_used[i].pin);
+                gpio_set_dir(pins[i], dir);
+                gpio_put(pins[i], 0);
             }
             pins_used[0].mode = 1;
+            gpio_put(pins[0], 1);
         }
 
         /*
@@ -45,14 +50,6 @@ namespace uazips
         inline ~VirtualMultiplexer()
         {
             delete[] pins_used;
-        }
-
-        inline void InitializePins()
-        {
-            for (int i = 0; i < total_pins; i++)
-            {
-                gpio_init(pins_used[i].pin);
-            }
         }
 
         // Sets a specific pin number to high and all others to low.
@@ -110,7 +107,7 @@ namespace uazips
         inline uint8_t GetPinByIndex(size_t index) const
         {
             if (index >= total_pins)
-                return 0;
+                return pins_used[total_pins - 1].pin;
             return pins_used[index].pin;
         }
 
