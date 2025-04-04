@@ -1,6 +1,7 @@
 #pragma once
 
 #include <pico/time.h>
+#include <stdint.h>
 
 namespace uazips
 {
