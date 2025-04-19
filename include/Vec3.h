@@ -16,7 +16,7 @@ namespace uazips
         {
         }
 
-        inline Vec3() : Vec3(0.f, 0.f, 0.f)
+        inline Vec3() : Vec3((D)0.0, (D)0.0, (D)0.0)
         {
         }
 
@@ -118,17 +118,17 @@ namespace uazips
 
         inline Vec3& operator++()
         {
-            x += 1.f;
-            y += 1.f;
-            z += 1.f;
+            x += (D)1.0;
+            y += (D)1.0;
+            z += (D)1.0;
             return *this;
         }
 
         inline Vec3& operator--()
         {
-            x -= 1.f;
-            y -= 1.f;
-            z -= 1.f;
+            x -= (D)1.0;
+            y -= (D)1.0;
+            z -= (D)1.0;
             return *this;
         }
 
@@ -149,7 +149,7 @@ namespace uazips
     using Vec3i64 = Vec3<int64_t>;
     using Vec3u64 = Vec3<uint64_t>;
 
-    // Not guaranteed to be ideal.
+    // Not guaranteed to be functional.
     using Vec3i128 = Vec3<__int128_t>;
     using Vec3u128 = Vec3<__uint128_t>;
 }

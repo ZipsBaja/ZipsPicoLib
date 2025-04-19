@@ -2,7 +2,6 @@
 
 #pragma once
 
-#include <stdarg.h>
 #include <pico/stdlib.h>
 
 #if defined(USING_PICO_W) || defined(USING_PICO_2_W)
@@ -100,19 +99,5 @@ static inline void init_libs()
     zl_are_libraries_initialized = 1;
 }
 
-#define resume_on(func) while (1) \
-    { \
-        if (func) \
-            break; \
-    }
-
-typedef bool (*vararg_func_ptr_t)(...);
-static inline void resume_on_ptr(vararg_func_ptr_t func, ...)
-{
-    va_list args;
-    while (1)
-    {
-        if ((*func)(args));
-            break;
-    }
-}
+#include <hardware/watchdog.h>
+#define RESTART_PROGRAM() watchdog_enable(1, 1); while (1) {}
