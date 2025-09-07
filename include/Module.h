@@ -1,6 +1,9 @@
 #pragma once
 
+#include <ZipsLib.h>
+
 #include <vector>
+#include <typeinfo>
 
 namespace uazips
 {
@@ -8,7 +11,7 @@ namespace uazips
     class Module
     {
     public:
-        static std::vector<const Module*> InstalledModules;
+        static std::vector<Module*> InstalledModules;
 
     public:
         inline Module()
@@ -18,7 +21,7 @@ namespace uazips
         virtual ~Module() {}
 
         template<class Mod, typename InType>
-        static bool IsModuleAType(const InType&& module)
+        static inline bool IsModuleAType(InType&& module)
         {
             if constexpr !(std::is_pointer_v<std::decay_t<InType>>)
                 IsModuleAType<Mod>(module);
@@ -27,7 +30,7 @@ namespace uazips
         }
 
         template<class Mod>
-        static std::vector<Mod> GetModulesByType()
+        static inline std::vector<Mod> GetModulesByType()
         {
             std::vector<Mod*> modules;
             for (auto&& mod : InstalledModules)
@@ -36,9 +39,18 @@ namespace uazips
             return modules;
         }
 
-        virtual void Initialize() = 0;
+        virtual bool Initialize() = 0;
+
+        static inline void InitAll()
+        {
+            for (auto&& mod : InstalledModules)
+                if (mod->Initialize())
+                    LOG("Module of type %s initialized.\n", typeid(*mod).name());
+                else
+                    LOG("Module of type %s failed to initialize.\n", typeid(*mod).name());
+        }
     };
 
-    std::vector<const Module*> Module::InstalledModules = {};
+    std::vector<Module*> Module::InstalledModules = {};
 
 }
