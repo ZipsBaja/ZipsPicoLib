@@ -149,7 +149,7 @@ namespace uazips
     using Vec3i64 = Vec3<int64_t>;
     using Vec3u64 = Vec3<uint64_t>;
 
-    // Not guaranteed to be functional.
-    using Vec3i128 = Vec3<__int128_t>;
-    using Vec3u128 = Vec3<__uint128_t>;
+// Not guaranteed to be functional.
+//  using Vec3i128 = Vec3<__int128_t>;
+//  using Vec3u128 = Vec3<__uint128_t>;
 }
