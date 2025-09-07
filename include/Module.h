@@ -50,7 +50,4 @@ namespace uazips
                     LOG("Module of type %s failed to initialize.\n", typeid(*mod).name());
         }
     };
-
-    std::vector<Module*> Module::InstalledModules = {};
-
 }
