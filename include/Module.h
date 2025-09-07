@@ -23,7 +23,7 @@ namespace uazips
         template<class Mod, typename InType>
         static inline bool IsModuleAType(InType&& module)
         {
-            if constexpr !(std::is_pointer_v<std::decay_t<InType>>)
+            if constexpr (!(std::is_pointer_v<std::decay_t<InType>>))
                 IsModuleAType<Mod>(module);
             else
                 return dynamic_cast<Mod*>(module) != nullptr;
