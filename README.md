@@ -1,6 +1,6 @@
 # Akron Zips Baja Raspberry Pi Pico Library
 
-This header-only library is used in the projects using the Raspberry Pi Pico family microcontrollers.
+This (almost) header-only library is used in the projects using the Raspberry Pi Pico family microcontrollers.
 To use this library, either clone or add this repository as a submodule. It is recommended to add as a submodule.
 `git submodule add https://github.com/ZipsBaja/ZipsPicoLib <library directory>`
 
