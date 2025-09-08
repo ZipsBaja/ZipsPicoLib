@@ -8,10 +8,16 @@ namespace uazips
 
     struct TimeHandler
     {
+        // measured in microseconds
         uint64_t TimeWhenCreated;
         uint64_t TimeThen;
         uint64_t TimeNow;
         uint64_t DeltaTime;
+        //
+
+        // measured in seconds
+        float dt;
+
         inline TimeHandler()
         {
             TimeWhenCreated = get_absolute_time();
@@ -24,6 +30,7 @@ namespace uazips
             TimeNow = get_absolute_time();   
             DeltaTime = TimeNow - TimeThen;
             TimeThen = TimeNow;
+            dt = static_cast<float>(DeltaTime) / 1000.f;
         }
 
         inline uint64_t GetElapsed() const
@@ -34,6 +41,11 @@ namespace uazips
         inline operator uint64_t() const
         {
             return DeltaTime;
+        }
+
+        inline operator float() const
+        {
+            return dt;
         }
     };
 
