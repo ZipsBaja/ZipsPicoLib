@@ -7,6 +7,9 @@
 
 #include <stdint.h>
 
+constexpr double degrees_to_radians = 0.0174532925199;
+constexpr double radians_to_degrees = 57.2957795131;
+
 namespace uazips
 {
     template<typename D>
@@ -116,6 +119,25 @@ namespace uazips
             return x * Other.x + y * Other.y + z * Other.z;
         }
 
+        inline Vec3 Cross(const Vec3& Other) const
+        {
+            return Vec3(
+                y*Other.z - z*Other.y,
+                z*Other.x - x*Other.z,
+                x*Other.y - y*Other.x
+            );
+        }
+
+        inline Vec3 ToDegrees() const
+        {
+            return Vec3(x * radians_to_degrees, y * radians_to_degrees, z * radians_to_degrees);
+        }
+
+        inline Vec3 ToRadians() const
+        {
+            return Vec3(x * degrees_to_radians, y * degrees_to_radians, z * degrees_to_radians);
+        }
+
         inline Vec3& operator++()
         {
             x += (D)1.0;
@@ -137,6 +159,18 @@ namespace uazips
             return (Other - *this).Length();
         }
     };
+
+    template<typename D>
+    inline Vec3<D> operator*(D Scalar, Vec3<D> Vector)
+    {
+        return Vector * Scalar;
+    }
+
+    template<typename D>
+    inline Vec3<D> operator/(D Scalar, Vec3<D> Vector)
+    {
+        return Vector / Scalar;
+    }
 
     using Vec3f = Vec3<float>;
     using Vec3d = Vec3<double>;
