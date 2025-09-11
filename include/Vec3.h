@@ -5,8 +5,8 @@
 
 #pragma once
 
-#include <stdint.h>
 #include <cmath>
+#include <cstdint>
 
 constexpr double degrees_to_radians = 0.0174532925199;
 constexpr double radians_to_degrees = 57.2957795131;
@@ -106,7 +106,7 @@ namespace uazips
 
         inline D Length() const
         {
-            return sqrtf(x*x + y*y + z*z);
+            return std::sqrt(x*x + y*y + z*z);
         }
 
         inline Vec3 Normalized() const
