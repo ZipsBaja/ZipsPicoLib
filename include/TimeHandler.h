@@ -14,7 +14,7 @@ namespace uazips
 {
 #if USING_MULTICORE
     struct TimeHandler;
-    static void offload_time_updating(TimeHandler* th);
+    void offload_time_updating(TimeHandler* th);
 #endif
 
     struct TimeHandler
@@ -41,8 +41,8 @@ namespace uazips
         {
             TimeNow = get_absolute_time();   
             DeltaTime = TimeNow - TimeThen;
-            TimeThen = TimeNow;
             dt = static_cast<float>(DeltaTime) * 1e-6f;
+            TimeThen = TimeNow;
         }
 
         inline uint64_t GetElapsed() const
