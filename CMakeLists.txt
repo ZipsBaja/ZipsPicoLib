@@ -8,5 +8,5 @@ target_include_directories(ZipsPicoLib PUBLIC
 
 target_link_libraries(ZipsPicoLib
     pico_stdlib
-    $<IF:${USING_MULTICORE},pico_multicore,"">
+    $<IF:${USE_MULTICORE_CMAKE},pico_multicore,"">
 )
