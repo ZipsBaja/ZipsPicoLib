@@ -12,8 +12,10 @@
 
 namespace uazips
 {
+#if USING_MULTICORE
     struct TimeHandler;
-    void offload_time_updating(TimeHandler& th);
+    static void offload_time_updating(TimeHandler* th);
+#endif
 
     struct TimeHandler
     {
@@ -40,7 +42,7 @@ namespace uazips
             TimeNow = get_absolute_time();   
             DeltaTime = TimeNow - TimeThen;
             TimeThen = TimeNow;
-            dt = static_cast<float>(DeltaTime) / 1e6f;
+            dt = static_cast<float>(DeltaTime) * 1e-6f;
         }
 
         inline uint64_t GetElapsed() const
@@ -57,19 +59,10 @@ namespace uazips
         {
             return dt;
         }
-
+#if USING_MULTICORE
         friend void offload_time_updating(TimeHandler*);
-
+#endif
     private:
         static TimeHandler* instance;
     };
-
-    void offload_time_updating(TimeHandler* th)
-    {
-        TimeHandler::instance = th;
-        multicore_launch_core1([](){
-            TimeHandler::instance->Update();
-        });
-    }
-
 }
