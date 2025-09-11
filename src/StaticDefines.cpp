@@ -7,6 +7,6 @@ namespace uazips
     std::vector<Module*> Module::InstalledModules = {};
 
 #if USING_MULTICORE
-    TimeHandler TimeHandler::instance = TimeHandler();
+    TimeHandler* TimeHandler::instance = nullptr;
 #endif
 }

@@ -4,7 +4,7 @@
 #include <stdint.h>
 
 #ifndef USING_MULTICORE
-#define USING_MULTICORE 0
+#define USING_MULTICORE 1
 #endif
 #if USING_MULTICORE
 #include <pico/multicore.h>
@@ -12,19 +12,12 @@
 
 namespace uazips
 {
+    struct TimeHandler;
+    void offload_time_updating(TimeHandler& th);
 
     struct TimeHandler
     {
-#if USING_MULTICORE
-        static TimeHandler instance;
 
-    private:
-        static void __time_handler_update_thread()
-        {
-            instance.Update();
-        }
-#endif
-    public:
         // measured in microseconds
         uint64_t TimeWhenCreated;
         uint64_t TimeThen;
@@ -40,9 +33,6 @@ namespace uazips
             TimeWhenCreated = get_absolute_time();
             TimeThen = TimeWhenCreated;
             TimeNow = TimeWhenCreated;
-#if USING_MULTICORE
-            multicore_launch_core1(&__time_handler_update_thread);
-#endif
         }
 
         inline void Update()
@@ -67,7 +57,19 @@ namespace uazips
         {
             return dt;
         }
-        
+
+        friend void offload_time_updating(TimeHandler*);
+
+    private:
+        static TimeHandler* instance;
     };
+
+    void offload_time_updating(TimeHandler* th)
+    {
+        TimeHandler::instance = th;
+        multicore_launch_core1([](){
+            TimeHandler::instance->Update();
+        });
+    }
 
 }
