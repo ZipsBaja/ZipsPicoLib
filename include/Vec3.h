@@ -141,7 +141,7 @@ namespace uazips
 
         inline Vec3 Rotate(const Vec3& Rotation, bool in_degrees = 0)
         {
-            Vec3f radians_half = (in_degrees ? Rotation.ToRadians() : Rotation) * (D)0.5;
+            Vec3 radians_half = (in_degrees ? Rotation.ToRadians() : Rotation) * (D)0.5;
 
             D croll = std::cos(radians_half.x), sroll = std::sin(radians_half.x);
             D cpitch = std::cos(radians_half.y), spitch = std::sin(radians_half.y);
