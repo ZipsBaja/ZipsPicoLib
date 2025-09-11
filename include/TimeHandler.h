@@ -3,11 +3,28 @@
 #include <pico/time.h>
 #include <stdint.h>
 
+#ifndef USING_MULTICORE
+#define USING_MULTICORE 0
+#endif
+#if USING_MULTICORE
+#include <pico/multicore.h>
+#endif
+
 namespace uazips
 {
 
     struct TimeHandler
     {
+#if USING_MULTICORE
+        static TimeHandler instance;
+
+    private:
+        static void __time_handler_update_thread()
+        {
+            instance.Update();
+        }
+#endif
+    public:
         // measured in microseconds
         uint64_t TimeWhenCreated;
         uint64_t TimeThen;
@@ -23,6 +40,9 @@ namespace uazips
             TimeWhenCreated = get_absolute_time();
             TimeThen = TimeWhenCreated;
             TimeNow = TimeWhenCreated;
+#if USING_MULTICORE
+            multicore_launch_core1(&__time_handler_update_thread);
+#endif
         }
 
         inline void Update()
@@ -30,7 +50,7 @@ namespace uazips
             TimeNow = get_absolute_time();   
             DeltaTime = TimeNow - TimeThen;
             TimeThen = TimeNow;
-            dt = static_cast<float>(DeltaTime) / 1000.f;
+            dt = static_cast<float>(DeltaTime) / 1e6f;
         }
 
         inline uint64_t GetElapsed() const
@@ -47,6 +67,7 @@ namespace uazips
         {
             return dt;
         }
+        
     };
 
 }
