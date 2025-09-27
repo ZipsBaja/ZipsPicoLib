@@ -9,20 +9,20 @@ namespace uazips
 
         D w, x, y, z;
 
-        Quaternion() : w((D)1.0), x((D)0.0), y((D)0.0), z((D)0.0)
+        inline Quaternion() : w((D)1.0), x((D)0.0), y((D)0.0), z((D)0.0)
         {
         }
 
-        Quaternion(D w, D x, D y, D z) : w(w), x(x), y(y), z(z)
+        inline Quaternion(D w, D x, D y, D z) : w(w), x(x), y(y), z(z)
         {
         }
 
-        D Magnitude() const
+        inline D Magnitude() const
         {
             return std::sqrt(w*w+x*x+y*y+z*z);
         }
 
-        Quaternion Normalize() const
+        inline Quaternion Normalize() const
         {
             D mag = Magnitude();
             return {
@@ -33,13 +33,13 @@ namespace uazips
             };
         }
 
-        Quaternion Inverse() const
+        inline Quaternion Inverse() const
         {
             D mag = Magnitude();
             return Conjugate() * ((D)1.0 / (mag*mag));
         }
 
-        Quaternion operator*(const Quaternion& q) const
+        inline Quaternion operator*(const Quaternion& q) const
         {
             return Quaternion(
                 w*q.w - x*q.x - y*q.y - z*q.z,  // new w
@@ -49,52 +49,52 @@ namespace uazips
             );
         }
 
-        Quaternion operator*(D k) const
+        inline Quaternion operator*(D k) const
         {
             return {w*k, x*k, y*k, z*k};
         }
 
-        Quaternion& operator*=(const Quaternion& q)
+        inline Quaternion& operator*=(const Quaternion& q)
         {
             return *this * q;
         }
 
-        Quaternion& operator*=(D k)
+        inline Quaternion& operator*=(D k)
         {
             return *this * k;
         }
 
-        Quaternion operator/(const Quaternion& other) const
+        inline Quaternion operator/(const Quaternion& other) const
         {
             return *this * other.Inverse();
         }
 
-        Quaternion operator/(D k) const
+        inline Quaternion operator/(D k) const
         {
             return {w/k, x/k, y/k, z/k};
         }
 
-        Quaternion& operator/=(const Quaternion& q)
+        inline Quaternion& operator/=(const Quaternion& q)
         {
             return *this / q;
         }
 
-        Quaternion& operator/=(D k)
+        inline Quaternion& operator/=(D k)
         {
             return *this / k;
         }
 
-        Quaternion Conjugate() const
+        inline Quaternion Conjugate() const
         {
             return {w, -x, -y, -z};
         }
 
-        Quaternion operator-() const
+        inline Quaternion operator-() const
         {
             return {-w, -x, -y, -z};
         }
 
-        Quaternion& operator++()
+        inline Quaternion& operator++()
         {
             return {
                 w + (D)1.0,
@@ -104,7 +104,7 @@ namespace uazips
             };
         }
 
-        Quaternion& operator--()
+        inline Quaternion& operator--()
         {
             return {
                 w - (D)1.0,
@@ -112,6 +112,16 @@ namespace uazips
                 y - (D)1.0,
                 z - (D)1.0
             };
+        }
+
+        inline bool operator==(const Quaternion& other) const
+        {
+            return (w == other.w && x == other.x && y == other.y && z == other.z);
+        }
+
+        inline bool operator!=(const Quaternion& other) const
+        {
+            return !(*this == other);
         }
 
     };
