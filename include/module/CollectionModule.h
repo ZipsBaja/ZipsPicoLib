@@ -15,6 +15,7 @@ namespace uazips
             for (size_t i = 0; i < m_elements.size(); i++)
                 if (m_elements[i] == element_to_find)
                     return i;
+            return 0;
         }
 
     public:
