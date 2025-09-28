@@ -1,5 +1,5 @@
-#include <Module.h>
-#include <TimeHandler.h>
+#include <module/Module.h>
+#include <util/TimeHandler.h>
 
 namespace uazips
 {
