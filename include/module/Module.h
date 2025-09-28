@@ -18,7 +18,9 @@ namespace uazips
         {
             InstalledModules.push_back(this);
         }
-        virtual ~Module() {}
+        inline virtual ~Module()
+        {
+        }
 
         template<class Mod>
         static inline bool IsModuleAType(const Module* module)
