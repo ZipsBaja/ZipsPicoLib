@@ -13,7 +13,8 @@ namespace uazips
         bool allow;
         bool state;
         uint8_t pin;
-        const std::function<void()>& action;
+        std::function<void()> action;
+
     public:
         inline Button(uint8_t button_pin, const std::function<void()>& action)
             : pin(button_pin), action(action), allow(true), state(false)
@@ -35,6 +36,11 @@ namespace uazips
         inline bool IsPressed() const
         {
             return state;
+        }
+
+        inline void SetAction(const std::function<void()>& action)
+        {
+            this->action = action;
         }
     };
 
