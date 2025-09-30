@@ -24,16 +24,18 @@ namespace uazips
             gpio_pull_down(pin);
         }
 
-        inline void Poll()
+        inline bool Poll()
         {
             state = gpio_get(pin);
             if (state && allow)
             {
                 allow = false;
                 action();
+                return true;
             }
             else if (!state)
                 allow = true;
+            return false;
         }
 
         inline bool IsPressed() const
