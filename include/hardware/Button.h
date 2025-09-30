@@ -19,6 +19,9 @@ namespace uazips
         inline Button(uint8_t button_pin, const std::function<void()>& action)
             : pin(button_pin), action(action), allow(true), state(false)
         {
+            gpio_init(pin);
+            gpio_set_dir(pin, GPIO_IN);
+            gpio_pull_down(pin);
         }
 
         inline void Poll()

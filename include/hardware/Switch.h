@@ -18,6 +18,9 @@ namespace uazips
         inline Switch(uint8_t pin, const std::function<void()>& action)
             : pin(pin), action(action), state(false)
         {
+            gpio_init(pin);
+            gpio_set_dir(pin, GPIO_IN);
+            gpio_pull_down(pin);
         }
 
         inline void Poll()
