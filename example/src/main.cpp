@@ -2,11 +2,12 @@
 
 int main()
 {
-    init_libs();
-    
+    BEGIN_SETUP();
+
+    BEGIN_LOOP();
     while (1)
     {
-        LOG("Testing\n");
+        tight_loop_contents();
     }
 
     return 0;

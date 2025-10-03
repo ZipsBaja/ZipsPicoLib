@@ -29,7 +29,7 @@ project(Example C CXX ASM)
 pico_sdk_init()
 
 option(USING_PRINT "stdout" ON)
-option(USING_MULTICORE "multicore" OFF)
+option(USING_MULTICORE "multicore" ON)
 if (USING_PRINT)
 add_compile_definitions(USING_PRINT=1)
 set(USE_PRINT_CMAKE 1)
@@ -49,6 +49,7 @@ add_executable(${CMAKE_PROJECT_NAME} src/main.cpp)
 
 target_link_libraries(${CMAKE_PROJECT_NAME}
     pico_stdlib
+    pico_multicore
     ZipsPicoLib
 )
 

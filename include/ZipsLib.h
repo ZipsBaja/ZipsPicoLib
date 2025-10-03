@@ -4,6 +4,15 @@
 
 #include <pico/stdlib.h>
 
+#include <stdint.h>
+
+#if __cplusplus >= 202002L
+// c++20 features
+#else
+// c++<20 workarounds
+#define consteval constexpr
+#endif
+
 #if defined(USING_PICO_W) || defined(USING_PICO_2_W)
 #include <pico/cyw43_arch.h>
 // A macro used ONLY for intellisense to remove errors.
@@ -35,6 +44,10 @@
 #define LOGCHAR(v)
 #endif
 
+#if USING_MULTICORE
+#include <pico/multicore.h>
+#endif
+
 #if defined(USING_PICO) || defined(USING_PICO_2)
 #define LED_PIN 25
 #define PICO_LED_ON() gpio_put(LED_PIN, 1)
@@ -50,6 +63,9 @@
 #else
 #error "Please define a macro for the Pico board type in your CMakeLists.txt file."
 #endif
+
+#define PICO_TOTAL_GPIO_PINS 30
+#define PICO_TOTAL_TIMERS 4
 
 // Used only for setup process.
 static int zl_are_libraries_initialized = 0;

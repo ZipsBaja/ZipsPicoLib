@@ -1,52 +1,16 @@
 #pragma once
 
-#include <functional>
-#include <stdint.h>
-#include <pico/stdlib.h>
+#include "IODevice.h"
 
 namespace uazips
 {
 
-    class Button
-    {
-    private:
-        bool allow;
-        bool state;
-        uint8_t pin;
-        std::function<void()> action;
-
+    class Button : public IODevice
+    {   
     public:
-        inline Button(uint8_t button_pin, const std::function<void()>& action)
-            : pin(button_pin), action(action), allow(true), state(false)
-        {
-            gpio_init(pin);
-            gpio_set_dir(pin, GPIO_IN);
-            gpio_pull_down(pin);
-        }
-
-        inline bool Poll()
-        {
-            state = gpio_get(pin);
-            if (state && allow)
-            {
-                allow = false;
-                action();
-                return true;
-            }
-            else if (!state)
-                allow = true;
-            return false;
-        }
-
-        inline bool IsPressed() const
-        {
-            return state;
-        }
-
-        inline void SetAction(const std::function<void()>& action)
-        {
-            this->action = action;
-        }
+        Button(uint8_t gpio_pin, const std::function<void()>& action);
+        
+        virtual void HandleIRQ(uint32_t events) override;
     };
 
 }
