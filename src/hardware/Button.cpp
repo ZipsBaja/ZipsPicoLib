@@ -3,8 +3,13 @@
 namespace uazips
 {
 
-    Button::Button(uint8_t gpio_pin, const std::function<void()>& action)
+    Button::Button(uint8_t gpio_pin, const EventHandler& action)
         : IODevice(gpio_pin, action)
+    {
+    }
+
+    Button::Button(uint8_t gpio_pin, const BasicEventHandler& action)
+    :   IODevice(gpio_pin, action)
     {
     }
 
@@ -12,10 +17,8 @@ namespace uazips
     {
         if (events & GPIO_IRQ_EDGE_RISE)
         {
-            static ButtonEvent event;
-            event = ButtonEvent(gpio_pin, action);
-            Event* ptr = &event;
-            queue_try_add(&Event::event_queue, &ptr);
+            Event *event = new ButtonEvent(gpio_pin, action);
+            queue_try_add(&Event::event_queue, &event);
         }
     }
 

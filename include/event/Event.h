@@ -1,5 +1,7 @@
 #pragma once
 
+#include <util/TypeUtils.h>
+
 #include <stdint.h>
 #include <cstddef>
 #include <functional>
@@ -10,28 +12,49 @@
 
 namespace uazips
 {
+    class Event;
+
+    // Action function for all events. An input of type Event* referencing
+    // the event that is triggered, and a return of bool for the potential
+    // of loop-breakouts.
+    using EventHandler = std::function<bool(Event*)>;
+
+    // For simple actions without needing to specify a return statement.
+    // Will wrap into a bool function, will always return true.
+    using BasicEventHandler = std::function<void(Event*)>;
 
     constexpr size_t queue_max_size = 64;
 
-    class IRQHandler
+    class EventActionSupplier
     {
     protected:
-        std::function<void()> action;
+        EventHandler action;
 
     public:
-        inline IRQHandler(const std::function<void()>& action) : action(action) {}
-        inline IRQHandler() : IRQHandler(nullptr) {}
+        EventActionSupplier(const EventHandler& action);
+        EventActionSupplier(const BasicEventHandler& action);
+        
+        inline EventHandler GetAction() const
+        {
+            return action;
+        }
+    };
+
+    class IRQHandler : public EventActionSupplier
+    {
+    public:
+        inline IRQHandler(const EventHandler& action) : EventActionSupplier(action) {}
+        inline IRQHandler(const BasicEventHandler& action) : EventActionSupplier(action) {}
+        inline IRQHandler() : IRQHandler([](Event*){}) {}
+        virtual inline ~IRQHandler() = default;
         
         virtual void HandleIRQ(uint32_t events) = 0;
     };
 
-    class Event
+    class Event : public EventActionSupplier
     {
     private:
         static bool is_queue_initialized;
-
-    protected:
-        std::function<void()> action;
 
     public:
         static queue_t event_queue;
@@ -42,7 +65,7 @@ namespace uazips
         static void HandleAllEvents(bool endless_loop, uint32_t us_debouncing = 0);
 
     public:
-        Event(const std::function<void()>& action);
+        Event(const EventHandler& action);
         inline Event() : Event(nullptr) {}
         
         virtual ~Event() = default;
@@ -56,7 +79,7 @@ namespace uazips
         uint8_t gpio_pin;
 
     public:
-        GPIOEvent(uint8_t gpio_pin, const std::function<void()>& action);
+        GPIOEvent(uint8_t gpio_pin, const EventHandler& action);
         inline GPIOEvent() : Event() {};
 
         inline uint8_t GetPin() const
@@ -69,14 +92,14 @@ namespace uazips
     {
     public:
         inline ButtonEvent() : GPIOEvent() {}
-        ButtonEvent(uint8_t gpio_pin, const std::function<void()>& action);
+        ButtonEvent(uint8_t gpio_pin, const EventHandler& action);
     };
 
     class TimerEvent : public Event
     {
     public:
         inline TimerEvent() : Event() {}
-        TimerEvent(const std::function<void()>& action);
+        TimerEvent(const EventHandler& action);
 
     };
 

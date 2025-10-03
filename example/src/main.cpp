@@ -1,4 +1,7 @@
 #include <ZipsLib.h>
+#include <hardware/Button.h>
+
+using namespace uazips;
 
 int main()
 {
@@ -7,7 +10,6 @@ int main()
     BEGIN_LOOP();
     while (1)
     {
-        tight_loop_contents();
     }
 
     return 0;

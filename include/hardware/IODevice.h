@@ -15,7 +15,8 @@ namespace uazips
         static void GPIODispatch(uint8_t pin, uint32_t events);
 
     public:
-        IODevice(uint8_t gpio_pin, const std::function<void()>& action);
+        IODevice(uint8_t gpio_pin, const EventHandler& action);
+        IODevice(uint8_t gpio_pin, const BasicEventHandler& action);
         virtual ~IODevice();
 
         inline uint8_t GetPin() const

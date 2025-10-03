@@ -6,14 +6,14 @@
 namespace uazips
 {
 
-    class TimeDevice
+    class TimeDevice : public EventActionSupplier
     {
     protected:
         bool is_active;
-        std::function<void()> action;
 
     public:
-        TimeDevice(const std::function<void()>& action);
+        TimeDevice(const EventHandler& action);
+        TimeDevice(const BasicEventHandler& action);
         virtual ~TimeDevice() = default;
 
         virtual void Begin(int32_t ms) = 0;
@@ -28,7 +28,8 @@ namespace uazips
         static bool TimerCallback(repeating_timer_t* timer);
 
     public:
-        RepeatingTimer(const std::function<void()>& action);
+        RepeatingTimer(const EventHandler& action);
+        RepeatingTimer(const BasicEventHandler& action);
         virtual ~RepeatingTimer();
 
         virtual void Begin(int32_t ms) override;
@@ -43,7 +44,8 @@ namespace uazips
         static bool TimerCallback(alarm_id_t id, void* timer);
 
     public:
-        CountdownTimer(const std::function<void()>& action);
+        CountdownTimer(const EventHandler& action);
+        CountdownTimer(const BasicEventHandler& action);
         virtual ~CountdownTimer();
 
         virtual void Begin(int32_t ms) override;

@@ -12,6 +12,19 @@ namespace uazips
     bool Event::is_queue_initialized = false;
     queue_t Event::event_queue = {};
 
+    EventActionSupplier::EventActionSupplier(const EventHandler& action)
+        : action(action)
+    {
+    }
+
+    EventActionSupplier::EventActionSupplier(const BasicEventHandler& action)
+        : action([action](Event* event){
+            action(event);
+            return true;
+        })
+    {
+    }
+
     void Event::HandleAllEvents(bool endless_loop, uint32_t us_debouncing)
     {
         if (endless_loop)
@@ -30,7 +43,10 @@ namespace uazips
                         Event* event;
                         queue_remove_blocking(&event_queue, &event);
                         if (event)
+                        {
                             event->HandleEvent();
+                            delete event;
+                        }
                     }
                 }
             }
@@ -41,7 +57,10 @@ namespace uazips
                     Event* event;
                     queue_remove_blocking(&event_queue, &event);
                     if (event)
+                    {
                         event->HandleEvent();
+                        delete event;
+                    }
                 }
             }
             
@@ -51,12 +70,15 @@ namespace uazips
             Event* event;
             queue_remove_blocking(&event_queue, &event);
             if (event)
+            {
                 event->HandleEvent();
+                delete event;
+            }
         }
     }
 
-    Event::Event(const std::function<void()>& action)
-        : action(action)
+    Event::Event(const EventHandler& action)
+        : EventActionSupplier(action)
     {
         if (!is_queue_initialized)
         {
@@ -67,20 +89,20 @@ namespace uazips
 
     void Event::HandleEvent()
     {
-        action();
+        action(this);
     }
 
-    GPIOEvent::GPIOEvent(uint8_t gpio_pin, const std::function<void()>& action)
+    GPIOEvent::GPIOEvent(uint8_t gpio_pin, const EventHandler& action)
         : Event(action), gpio_pin(gpio_pin)
     {
     }
 
-    ButtonEvent::ButtonEvent(uint8_t gpio_pin, const std::function<void()>& action)
+    ButtonEvent::ButtonEvent(uint8_t gpio_pin, const EventHandler& action)
         : GPIOEvent(gpio_pin, action)
     {
     }
 
-    TimerEvent::TimerEvent(const std::function<void()>& action)
+    TimerEvent::TimerEvent(const EventHandler& action)
         : Event(action)
     {
     }

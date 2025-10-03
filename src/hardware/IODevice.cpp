@@ -10,7 +10,7 @@ namespace uazips
             instances[pin]->HandleIRQ(events);
     }
 
-    IODevice::IODevice(uint8_t gpio_pin, const std::function<void()>& action)
+    IODevice::IODevice(uint8_t gpio_pin, const EventHandler& action)
         : IRQHandler(action)
     {
         instances[gpio_pin] = this;
@@ -19,7 +19,17 @@ namespace uazips
         gpio_pull_down(gpio_pin);
 
         gpio_set_irq_enabled_with_callback(gpio_pin, GPIO_IRQ_EDGE_RISE, true, (gpio_irq_callback_t)&GPIODispatch);
+    }
 
+    IODevice::IODevice(uint8_t gpio_pin, const BasicEventHandler& action)
+        : IRQHandler(action)
+    {
+        instances[gpio_pin] = this;
+        gpio_init(gpio_pin);
+        gpio_set_dir(gpio_pin, GPIO_IN);
+        gpio_pull_down(gpio_pin);
+
+        gpio_set_irq_enabled_with_callback(gpio_pin, GPIO_IRQ_EDGE_RISE, true, (gpio_irq_callback_t)&GPIODispatch);
     }
 
     IODevice::~IODevice()
