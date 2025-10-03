@@ -9,12 +9,13 @@ namespace uazips
         // A return of true breaks out the loop, and a return of false stays in the loop.
         namespace breakfunctions
         {
-            constexpr inline bool ignore()
+            template<typename T>
+            constexpr inline bool ignore(T)
             {
                 return false;
             }
-
-            constexpr inline bool abort()
+            template<typename T>
+            constexpr inline bool abort(T)
             {
                 return true;
             }
