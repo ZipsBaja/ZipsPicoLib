@@ -12,19 +12,6 @@ namespace uazips
     bool Event::is_queue_initialized = false;
     queue_t Event::event_queue = {};
 
-    EventActionSupplier::EventActionSupplier(const EventHandler& action)
-        : action(action)
-    {
-    }
-
-    EventActionSupplier::EventActionSupplier(const BasicEventHandler& action)
-        : action([action](Event* event){
-            action(event);
-            return true;
-        })
-    {
-    }
-
     void Event::HandleAllEvents(bool endless_loop, uint32_t us_debouncing)
     {
         if (endless_loop)
@@ -77,8 +64,8 @@ namespace uazips
         }
     }
 
-    Event::Event(const EventHandler& action)
-        : EventActionSupplier(action)
+    Event::Event(EventSourceBase* source)
+        : source(source)
     {
         if (!is_queue_initialized)
         {
@@ -86,25 +73,5 @@ namespace uazips
             queue_init(&event_queue, sizeof(Event*), queue_max_size);
         }
     };
-
-    void Event::HandleEvent()
-    {
-        action(this);
-    }
-
-    GPIOEvent::GPIOEvent(uint8_t gpio_pin, const EventHandler& action)
-        : Event(action), gpio_pin(gpio_pin)
-    {
-    }
-
-    ButtonEvent::ButtonEvent(uint8_t gpio_pin, const EventHandler& action)
-        : GPIOEvent(gpio_pin, action)
-    {
-    }
-
-    TimerEvent::TimerEvent(const EventHandler& action)
-        : Event(action)
-    {
-    }
 
 }

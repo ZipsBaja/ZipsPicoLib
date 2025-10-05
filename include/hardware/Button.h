@@ -5,11 +5,10 @@
 namespace uazips
 {
 
-    class Button : public IODevice
+    class Button : public IODevice<ButtonEvent>
     {   
     public:
-        Button(uint8_t gpio_pin, const EventHandler& action);
-        Button(uint8_t gpio_pin, const BasicEventHandler& action);
+        inline Button(uint8_t gpio_pin) : IODevice<ButtonEvent>(gpio_pin) {}
         virtual ~Button() = default;
         
         virtual void HandleIRQ(uint32_t events) override;

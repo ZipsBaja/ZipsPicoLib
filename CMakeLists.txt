@@ -1,7 +1,6 @@
 add_library(ZipsPicoLib STATIC
     src/StaticDefines.cpp
     src/event/Event.cpp
-    src/hardware/IODevice.cpp
     src/hardware/Button.cpp
     src/hardware/TimeDevice.cpp
 )

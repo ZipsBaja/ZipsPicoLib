@@ -4,31 +4,14 @@
 namespace uazips
 {
 
-    TimeDevice::TimeDevice(const EventHandler& action)
-        : is_active(false), EventActionSupplier(action)
-    {
-    }
-
     bool RepeatingTimer::TimerCallback(repeating_timer_t* timer)
     {
         if (RepeatingTimer* self = (RepeatingTimer*)timer->user_data)
         {
-            static TimerEvent event;
-            event = TimerEvent(self->action);
-            Event* ptr = &event;
-            queue_try_add(&Event::event_queue, &ptr);
+            Event* event = new TimerEvent(self);
+            queue_try_add(&Event::event_queue, &event);
         }
         return true;
-    }
-
-    RepeatingTimer::RepeatingTimer(const EventHandler& action)
-        : TimeDevice(action)
-    {
-    }
-
-    RepeatingTimer::RepeatingTimer(const BasicEventHandler& action)
-        : TimeDevice(action)
-    {
     }
 
     RepeatingTimer::~RepeatingTimer()
@@ -56,20 +39,10 @@ namespace uazips
     {
         if (CountdownTimer* self = (CountdownTimer*)timer)
         {
-            Event* event = new TimerEvent(self->action);
+            Event* event = new TimerEvent(self);
             queue_try_add(&Event::event_queue, &event);
         }
         return false;
-    }
-
-    CountdownTimer::CountdownTimer(const EventHandler& action)
-        : TimeDevice(action)
-    {
-    }
-    
-    CountdownTimer::CountdownTimer(const BasicEventHandler& action)
-        : TimeDevice(action)
-    {
     }
 
     CountdownTimer::~CountdownTimer()

@@ -5,6 +5,7 @@
 #include <stdint.h>
 #include <cstddef>
 #include <functional>
+#include <vector>
 
 #include <hardware/irq.h>
 #include <pico/util/queue.h>
@@ -14,47 +15,57 @@ namespace uazips
 {
     class Event;
 
-    // Action function for all events. An input of type Event* referencing
-    // the event that is triggered, and a return of bool for the potential
-    // of loop-breakouts.
-    using EventHandler = std::function<bool(Event*)>;
-
-    // For simple actions without needing to specify a return statement.
-    // Will wrap into a bool function, will always return true.
-    using BasicEventHandler = std::function<void(Event*)>;
-
     constexpr size_t queue_max_size = 64;
 
-    class EventActionSupplier
+    class EventSourceBase
     {
+    public:
+        virtual ~EventSourceBase() = default;
+    };
+
+    template<class EventType> requires Extends<EventType, Event>
+    class EventSource : public EventSourceBase
+    {
+    public:
+        using EventListener = std::function<void(const EventType*)>;
+
     protected:
-        EventHandler action;
+        std::vector<EventListener> listeners;
 
     public:
-        EventActionSupplier(const EventHandler& action);
-        EventActionSupplier(const BasicEventHandler& action);
-        
-        inline EventHandler GetAction() const
+        inline void AddListener(const EventListener& listener)
         {
-            return action;
+            listeners.push_back(listener);
+        }
+        inline void RemoveListener(const EventListener& listener)
+        {
+            std::erase(listeners, listener);
+        }
+
+        void AlertListeners(const EventType* event)
+        {
+            for (auto&& l : listeners)
+                l(event);
         }
     };
 
-    class IRQHandler : public EventActionSupplier
+    template<class EventType>
+    class IRQHandler : public EventSource<EventType>
     {
     public:
-        inline IRQHandler(const EventHandler& action) : EventActionSupplier(action) {}
-        inline IRQHandler(const BasicEventHandler& action) : EventActionSupplier(action) {}
-        inline IRQHandler() : IRQHandler([](Event*){}) {}
+        inline IRQHandler() : EventSource<EventType>() {}
         virtual inline ~IRQHandler() = default;
         
         virtual void HandleIRQ(uint32_t events) = 0;
     };
 
-    class Event : public EventActionSupplier
+    class Event
     {
     private:
         static bool is_queue_initialized;
+
+    protected:
+        EventSourceBase* source;
 
     public:
         static queue_t event_queue;
@@ -65,12 +76,16 @@ namespace uazips
         static void HandleAllEvents(bool endless_loop, uint32_t us_debouncing = 0);
 
     public:
-        Event(const EventHandler& action);
-        inline Event() : Event(nullptr) {}
-        
+        Event(EventSourceBase* source);
         virtual ~Event() = default;
 
-        virtual void HandleEvent();
+        template<class EventSourceType> requires Extends<EventSourceType, EventSourceBase>
+        inline EventSourceType* GetSource() const
+        {
+            return dynamic_cast<EventSourceType*>(source);
+        }
+
+        virtual void HandleEvent() {};
     };
 
     class GPIOEvent : public Event
@@ -79,8 +94,7 @@ namespace uazips
         uint8_t gpio_pin;
 
     public:
-        GPIOEvent(uint8_t gpio_pin, const EventHandler& action);
-        inline GPIOEvent() : Event() {};
+        inline GPIOEvent(EventSourceBase* source, uint8_t gpio_pin) : Event(source) {};
 
         inline uint8_t GetPin() const
         {
@@ -91,15 +105,13 @@ namespace uazips
     class ButtonEvent : public GPIOEvent
     {
     public:
-        inline ButtonEvent() : GPIOEvent() {}
-        ButtonEvent(uint8_t gpio_pin, const EventHandler& action);
+        inline ButtonEvent(EventSourceBase* source, uint8_t gpio_pin) : GPIOEvent(source, gpio_pin) {}
     };
 
     class TimerEvent : public Event
     {
     public:
-        inline TimerEvent() : Event() {}
-        TimerEvent(const EventHandler& action);
+        inline TimerEvent(EventSourceBase* source) : Event(source) {}
 
     };
 

@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include <Quaternion.h>
+#include "Quaternion.h"
 
 constexpr double degrees_to_radians = 0.0174532925199;
 constexpr double radians_to_degrees = 57.2957795131;
@@ -138,7 +138,7 @@ namespace uazips
             return Vec3(x * degrees_to_radians, y * degrees_to_radians, z * degrees_to_radians);
         }
 
-        inline Vec3 Rotate(const Quaternion<D> q) const
+        inline Vec3 Rotate(const Quaternion<D>& q) const
         {
             Quaternion<D> p(0, x, y, z);
             p = q * p;
