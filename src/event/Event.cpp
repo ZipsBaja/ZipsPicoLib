@@ -32,6 +32,7 @@ namespace uazips
                         if (event)
                         {
                             event->HandleEvent();
+                            event->source->Dispatch(event);
                             delete event;
                         }
                     }
@@ -46,6 +47,7 @@ namespace uazips
                     if (event)
                     {
                         event->HandleEvent();
+                        event->source->Dispatch(event);
                         delete event;
                     }
                 }
@@ -59,6 +61,7 @@ namespace uazips
             if (event)
             {
                 event->HandleEvent();
+                event->source->Dispatch(event);
                 delete event;
             }
         }
@@ -73,5 +76,4 @@ namespace uazips
             queue_init(&event_queue, sizeof(Event*), queue_max_size);
         }
     };
-
 }

@@ -21,6 +21,7 @@ namespace uazips
     {
     public:
         virtual ~EventSourceBase() = default;
+        virtual void Dispatch(const void* ev) = 0;
     };
 
     template<class EventType> requires Extends<EventType, Event>
@@ -42,10 +43,10 @@ namespace uazips
             std::erase(listeners, listener);
         }
 
-        void AlertListeners(const EventType* event)
+        virtual void Dispatch(const void* event) override
         {
             for (auto&& l : listeners)
-                l(event);
+                l((EventType*)event);
         }
     };
 
@@ -85,7 +86,7 @@ namespace uazips
             return dynamic_cast<EventSourceType*>(source);
         }
 
-        virtual void HandleEvent() {};
+        virtual void HandleEvent() {}
     };
 
     class GPIOEvent : public Event
@@ -112,7 +113,6 @@ namespace uazips
     {
     public:
         inline TimerEvent(EventSourceBase* source) : Event(source) {}
-
     };
 
 }
