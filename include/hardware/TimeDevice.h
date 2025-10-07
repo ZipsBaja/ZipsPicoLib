@@ -42,7 +42,7 @@ namespace uazips
         static bool TimerCallback(alarm_id_t id, void* timer);
 
     public:
-        inline CountdownTimer() : TimeDevice() {}
+        inline CountdownTimer() : TimeDevice(), id(-1) {}
         virtual ~CountdownTimer();
 
         virtual void Begin(int32_t ms) override;
