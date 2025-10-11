@@ -32,6 +32,8 @@ namespace uazips
 
     protected:
         std::vector<EventListener> listeners;
+        bool is_cycled = false;
+        size_t cycle_index = 0;
 
     public:
         inline void AddListener(const EventListener& listener)
@@ -43,10 +45,22 @@ namespace uazips
             std::erase(listeners, listener);
         }
 
-        virtual void Dispatch(const void* event) override
+        void Dispatch(const void* event) override
         {
-            for (auto&& l : listeners)
-                l((EventType*)event);
+            if (is_cycled)
+            {
+                listeners[cycle_index++]((EventType*)event);
+                if (cycle_index >= listeners.size())
+                    cycle_index = 0;
+            }
+            else
+                for (auto&& l : listeners)
+                    l((EventType*)event);
+        }
+
+        void SetCyclable(bool cycle)
+        {
+            is_cycled = cycle;
         }
     };
 

@@ -103,6 +103,22 @@ namespace uazips
             return *this;
         }
 
+        inline Vec3 operator%(D Mod) const
+        {
+            if constexpr (std::is_integral_v<D>)
+                return Vec3(x % Mod, y % Mod, z % Mod);
+            else if constexpr (std::is_floating_point_v<D>)
+                return Vec3(std::fmod(x, Mod), std::fmod(y, Mod), std::fmod(z, Mod));
+            else
+                return *this;
+        }
+
+        inline Vec3& operator%=(D Mod)
+        {
+            *this = *this % Mod;
+            return *this;
+        }
+
         inline D Length() const
         {
             return std::sqrt(x*x + y*y + z*z);
@@ -138,11 +154,10 @@ namespace uazips
             return Vec3(x * degrees_to_radians, y * degrees_to_radians, z * degrees_to_radians);
         }
 
-        inline Vec3 Rotate(const Quaternion<D>& q) const
+        inline Vec3 Rotate(Quaternion<D> q) const
         {
             Quaternion<D> p(0, x, y, z);
-            p = q * p;
-            p = p * q.Conjugate();
+            p = q * p * q.Conjugate();
 
             return {p.x, p.y, p.z};
         }
@@ -166,26 +181,70 @@ namespace uazips
             return *this + (t * w) + quat_vec.Cross(t);
         }
 
+        inline Vec3 operator++(int)
+        {
+            Vec3 before = *this;
+            x++;
+            y++;
+            z++;
+            return before;
+        }
+
+        inline Vec3 operator--(int)
+        {
+            Vec3 before = *this;
+            x--;
+            y--;
+            z--;
+            return before;
+        }
+
         inline Vec3& operator++()
         {
-            x += (D)1.0;
-            y += (D)1.0;
-            z += (D)1.0;
+            ++x;
+            ++y;
+            ++z;
             return *this;
         }
 
         inline Vec3& operator--()
         {
-            x -= (D)1.0;
-            y -= (D)1.0;
-            z -= (D)1.0;
+            --x;
+            --y;
+            --z;
             return *this;
         }
 
-        inline D operator|(const Vec3& Other) const
+        inline bool operator==(const Vec3& other) const
         {
-            return (Other - *this).Length();
+            return (x == other.x) && (y == other.y) && (z == other.z);
         }
+
+        inline bool operator!=(const Vec3& other) const
+        {
+            return !(*this == other);
+        }
+
+        inline bool operator>(const Vec3& other) const
+        {
+            return Length() > other.Length();
+        }
+
+        inline bool operator<(const Vec3& other) const
+        {
+            return Length() < other.Length();
+        }
+
+        inline bool operator>=(const Vec3& other) const
+        {
+            return Length() >= other.Length();
+        }
+
+        inline bool operator<=(const Vec3& other) const
+        {
+            return Length() <= other.Length();
+        }
+
     };
 
     template<typename D>

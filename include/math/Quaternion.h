@@ -56,17 +56,20 @@ namespace uazips
 
         inline Quaternion& operator*=(const Quaternion& q)
         {
-            return *this * q;
+            *this = *this * q;
+            return *this;
         }
 
         inline Quaternion& operator*=(D k)
         {
-            return *this * k;
+            *this = *this * k;
+            return *this;
         }
 
         inline Quaternion operator/(const Quaternion& other) const
         {
-            return *this * other.Inverse();
+            *this = *this * other.Inverse();
+            return *this;
         }
 
         inline Quaternion operator/(D k) const
@@ -76,12 +79,14 @@ namespace uazips
 
         inline Quaternion& operator/=(const Quaternion& q)
         {
-            return *this / q;
+            *this = *this / q;
+            return *this;
         }
 
         inline Quaternion& operator/=(D k)
         {
-            return *this / k;
+            *this = *this / k;
+            return *this;
         }
 
         inline Quaternion Conjugate() const
@@ -94,24 +99,42 @@ namespace uazips
             return {-w, -x, -y, -z};
         }
 
+        inline Quaternion operator++(int)
+        {
+            Quaternion<D> before = *this;
+            w++;
+            x++;
+            y++;
+            z++;
+            return before;
+        }
+
+        inline Quaternion operator--(int)
+        {
+            Quaternion<D> before = *this;
+            w--;
+            x--;
+            y--;
+            z--;
+            return before;
+        }
+
         inline Quaternion& operator++()
         {
-            return {
-                w + (D)1.0,
-                x + (D)1.0,
-                y + (D)1.0,
-                z + (D)1.0
-            };
+            ++w;
+            ++x;
+            ++y;
+            ++z;
+            return *this;
         }
 
         inline Quaternion& operator--()
         {
-            return {
-                w - (D)1.0,
-                x - (D)1.0,
-                y - (D)1.0,
-                z - (D)1.0
-            };
+            --w;
+            --x;
+            --y;
+            --z;
+            return *this;
         }
 
         inline bool operator==(const Quaternion& other) const
