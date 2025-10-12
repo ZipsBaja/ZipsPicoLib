@@ -59,27 +59,31 @@ namespace uazips
         }
 
         // Adds an action to be called when the event is fired.
-        inline void AddListener(const char* listener_name, const EventListener& listener)
+        inline const char* AddListener(const char* listener_name, const EventListener& listener)
         {
             listeners_map[listener_name] = listener;
             listeners.push_back(listener_name);
+            return listener_name;
         }
         // Removes an action from being called when the event is fired.
-        inline void RemoveListener(const char* listener_name)
+        inline const char* RemoveListener(const char* listener_name)
         {
             listeners_map.erase(listener_name);
             std::erase(listeners, listener_name);
+            return listener_name;
         }
 
         // Anonymous version; its time of creation is used as its identifier.
-        inline void AddListener(const EventListener& listener)
+        // I do not want to wrap the return in a smart pointer... so delete it.
+        inline const char* AddListener(const EventListener& listener)
         {
             char buff[9];
             memset(buff, '\0', 9);
             snprintf(buff, 8, "%llu", to_us_since_boot(get_absolute_time()));
-            char out[strlen(buff) + 1];
+            char* out = new char[strlen(buff) + 1];
             strcpy(out, buff);
             AddListener(out, listener);
+            return out;
         }
 
         void Dispatch(const void* event) override
@@ -141,7 +145,7 @@ namespace uazips
         // Useful for creating confirmation messages.
         // Ideally, the QUEUE dispatch system should be set for this to have its full functionality.
         template<class EventType1, class EventType2>
-        void AddDisjunctionListener(const char* advance_listener, const char* fallback_listener,
+        const char* AddDisjunctionListener(const char* advance_listener, const char* fallback_listener,
             EventSource<EventType1>& source1, EventSource<EventType2>& source2,
             const char* disjunction_name, const EventListener& listener)
         {
@@ -158,6 +162,7 @@ namespace uazips
                     source2.RemoveListener("__disjunc2__");
                 });
             });
+            return disjunction_name;
         }
 
         // Creates a listener that takes one EventSource object to call one action
