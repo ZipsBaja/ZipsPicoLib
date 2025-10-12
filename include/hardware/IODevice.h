@@ -28,10 +28,21 @@ namespace uazips
             gpio_pull_down(gpio_pin);
 
             gpio_set_irq_enabled_with_callback(gpio_pin, GPIO_IRQ_EDGE_RISE, true, (gpio_irq_callback_t)&GPIODispatch);
-        }
+        }   
         virtual ~IODevice()
         {
             instances[gpio_pin] = nullptr;
+            gpio_set_irq_enabled_with_callback(gpio_pin, GPIO_IRQ_EDGE_RISE, false, nullptr);
+        }
+
+        virtual void Enable() override
+        {
+            gpio_set_irq_enabled_with_callback(gpio_pin, GPIO_IRQ_EDGE_RISE, true, (gpio_irq_callback_t)&GPIODispatch);
+        }
+
+        virtual void Disable() override
+        {
+            gpio_set_irq_enabled_with_callback(gpio_pin, GPIO_IRQ_EDGE_RISE, false, nullptr);
         }
 
         inline uint8_t GetPin() const

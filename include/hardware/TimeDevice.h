@@ -10,13 +10,47 @@ namespace uazips
     {
     protected:
         bool is_active;
-
+        uint64_t us_elapsed;
+        uint64_t us_start;
+        uint64_t us_begintime;
     public:
-        inline TimeDevice() : EventSource<TimerEvent>(), is_active(false) {}
+        inline TimeDevice()
+            : EventSource<TimerEvent>(), is_active(false), us_elapsed(0), us_start(0), us_begintime(0) {}
         virtual ~TimeDevice() = default;
 
-        virtual void Begin(int32_t ms) = 0;
+        virtual void Begin(uint64_t ms) = 0;
         virtual void End() = 0;
+
+        inline uint64_t GetTimeElapsedMicroseconds() const
+        {
+            return us_elapsed;
+        }
+        inline uint64_t GetTimeElapsedMilliseconds() const
+        {
+            return us_elapsed / (uint64_t)1000;
+        }
+        inline float GetTimeElapsedSeconds() const
+        {
+            return us_elapsed * 1e-6f;
+        }
+
+        inline uint64_t GetTimeRemainingMicroseconds() const
+        {
+            return us_begintime - us_elapsed;
+        }
+        inline uint64_t GetTimeRemainingMilliseconds() const
+        {
+            return GetTimeRemainingMicroseconds() / (uint64_t)1000;
+        }
+        inline float GetTimeRemainingSeconds() const
+        {
+            return GetTimeElapsedMicroseconds() * 1e-6f;
+        }
+
+        inline void UpdateTime()
+        {
+            us_elapsed = to_us_since_boot(get_absolute_time()) - us_start;
+        }
     };
 
     class RepeatingTimer : public TimeDevice
@@ -30,7 +64,7 @@ namespace uazips
         inline RepeatingTimer() : TimeDevice() {}
         virtual ~RepeatingTimer();
 
-        virtual void Begin(int32_t ms) override;
+        virtual void Begin(uint64_t ms) override;
         virtual void End() override;
     };
 
@@ -45,7 +79,7 @@ namespace uazips
         inline CountdownTimer() : TimeDevice(), id(-1) {}
         virtual ~CountdownTimer();
 
-        virtual void Begin(int32_t ms) override;
+        virtual void Begin(uint64_t ms) override;
         virtual void End() override;
     };
 

@@ -1,5 +1,5 @@
 #include <hardware/TimeDevice.h>
-#include <time.h>
+#include <pico/time.h>
 
 namespace uazips
 {
@@ -10,6 +10,7 @@ namespace uazips
         {
             Event* event = new TimerEvent(self);
             queue_try_add(&Event::event_queue, &event);
+            self->us_start = to_us_since_boot(get_absolute_time());
         }
         return true;
     }
@@ -19,10 +20,13 @@ namespace uazips
         End();
     }
 
-    void RepeatingTimer::Begin(int32_t ms)
+    void RepeatingTimer::Begin(uint64_t ms)
     {
         if (is_active)
             return;
+            
+        us_begintime = ms * (uint64_t)1000;
+        us_start = to_us_since_boot(get_absolute_time());
         is_active = add_repeating_timer_ms(ms, (repeating_timer_callback_t)&TimerCallback, this, &repeat_timer);
     }
 
@@ -41,6 +45,7 @@ namespace uazips
         {
             Event* event = new TimerEvent(self);
             queue_try_add(&Event::event_queue, &event);
+            self->us_start = 0;
         }
         return false;
     }
@@ -50,10 +55,13 @@ namespace uazips
         End();
     }
 
-    void CountdownTimer::Begin(int32_t ms)
+    void CountdownTimer::Begin(uint64_t ms)
     {
         if (id >= 0)
             return;
+
+        us_begintime = ms * (uint64_t)1000;
+        us_start = to_us_since_boot(get_absolute_time());
         id = add_alarm_in_ms(ms, (alarm_callback_t)&TimerCallback, this, false);
     }
 
@@ -63,6 +71,7 @@ namespace uazips
         {
             cancel_alarm(id);
             id = -1;
+            is_active = false;
         }
     }
 
