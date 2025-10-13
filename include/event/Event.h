@@ -146,21 +146,23 @@ namespace uazips
         // Useful for creating confirmation messages.
         // Ideally, the QUEUE dispatch system should be set for this to have its full functionality.
         template<class EventType1, class EventType2>
-        const char* AddDisjunctionListener(const char* advance_listener, const char* fallback_listener,
-            EventSource<EventType1>& source1, EventSource<EventType2>& source2,
-            const char* disjunction_name, const EventListener& listener)
+        const char* AddDisjunctionListener(const char* disjunction_name, const char* advance_listener, const char* fallback_listener,
+            EventSource<EventType1>& source1, EventSource<EventType2>& source2, const EventListener& listener)
         {
+            const char disjunc1[] = "__disjunc1__";
+            const char disjunc2[] = "__disjunc2__";
+
             AddListener(disjunction_name, [&](const EventType* event){
                 listener(event);
-                source1.AddListener("__disjunc1__", [&](const EventType1* ev){
+                source1.AddListener(disjunc1, [&](const EventType1* ev){
                     queue_try_add(&action_queue, &advance_listener);
-                    source1.RemoveListener("__disjunc1__");
-                    source2.RemoveListener("__disjunc2__");
+                    source1.RemoveListener(disjunc1);
+                    source2.RemoveListener(disjunc2);
                 });
-                source2.AddListener("__disjunc2__", [&](const EventType2* ev){
+                source2.AddListener(disjunc2, [&](const EventType2* ev){
                     queue_try_add(&action_queue, &fallback_listener);
-                    source1.RemoveListener("__disjunc1__");
-                    source2.RemoveListener("__disjunc2__");
+                    source1.RemoveListener(disjunc1);
+                    source2.RemoveListener(disjunc2);
                 });
             });
             return disjunction_name;
@@ -171,22 +173,26 @@ namespace uazips
         // Useful for creatin confirmation messages.
         // Ideally, the QUEUE dispatch system should be set for this to have its full functionality.
         template<class EventType1>
-        void AddDisjunctionListener(const char* advance_listener, const char* fallback_listener,
-            EventSource<EventType1>& other_source, const char* disjunction_name, const EventListener& listener)
+        const char* AddDisjunctionListener(const char* disjunction_name, const char* advance_listener, const char* fallback_listener,
+            EventSource<EventType1>& other_source, const EventListener& listener)
         {
+            const char disjunc1[] = "__disjunc1__";
+            const char disjunc2[] = "__disjunc2__";
+
             AddListener(disjunction_name, [&](const EventType* event){
                 listener(event);
-                AddListener("__disjunc1__", [&](const EventType* ev){
+                AddListener(disjunc1, [&](const EventType* ev){
                     queue_try_add(&action_queue, &advance_listener);
-                    RemoveListener("__disjunc1__");
-                    other_source.RemoveListener("__disjunc2__");
+                    RemoveListener(disjunc1);
+                    other_source.RemoveListener(disjunc2);
                 });
-                other_source.AddListener("__disjunc2__", [&](const EventType1* ev){
+                other_source.AddListener(disjunc2, [&](const EventType1* ev){
                     queue_try_add(&action_queue, &fallback_listener);
-                    RemoveListener("__disjunc1__");
-                    other_source.RemoveListener("__disjunc2__");
+                    RemoveListener(disjunc1);
+                    other_source.RemoveListener(disjunc2);
                 });
             });
+            return disjunction_name;
         }
 
     };
