@@ -1,12 +1,11 @@
 #pragma once
 
 #include <util/TypeUtils.h>
+#include <util/FunctionUtils.h>
 
 #include <stdio.h>
-#include <string.h>
 #include <stdint.h>
 #include <cstddef>
-#include <functional>
 #include <map>
 #include <vector>
 #include <algorithm>
@@ -42,7 +41,7 @@ namespace uazips
         using EventListener = std::function<void(const EventType*)>;
 
     protected:
-        std::map<const char*, EventListener> listeners_map;
+        std::map<const char*, EventListener, functionutils::predicates::CStringCompare> listeners_map;
         std::vector<const char*> listeners;
         queue_t action_queue; // Accepts c strings
         EventDispatchSystem event_system;
@@ -69,7 +68,9 @@ namespace uazips
         inline const char* RemoveListener(const char* listener_name)
         {
             listeners_map.erase(listener_name);
-            std::erase(listeners, listener_name);
+            listeners.erase(std::remove_if(listeners.begin(), listeners.end(), [&listener_name](const char* s){
+                return strcmp(s, listener_name) == 0;
+            }));
             return listener_name;
         }
 

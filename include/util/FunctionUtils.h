@@ -1,5 +1,8 @@
 #pragma once
 
+#include <string.h>
+#include <functional>
+
 namespace uazips
 {
 
@@ -19,6 +22,17 @@ namespace uazips
             {
                 return true;
             }
+        }
+
+        namespace predicates
+        {
+            struct CStringCompare
+            {
+                inline bool operator()(const char* a, const char* b) const
+                {
+                    return strcmp(a, b) == 0;
+                }
+            };
         }
     }
 
