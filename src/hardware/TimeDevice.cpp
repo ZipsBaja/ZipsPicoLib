@@ -4,6 +4,11 @@
 namespace uazips
 {
 
+    void TimeDevice::OnRemoveListener()
+    {
+        End();
+    }
+
     bool RepeatingTimer::TimerCallback(repeating_timer_t* timer)
     {
         if (RepeatingTimer* self = (RepeatingTimer*)timer->user_data)
@@ -23,7 +28,10 @@ namespace uazips
     void RepeatingTimer::Begin(uint64_t ms)
     {
         if (is_active)
-            return;
+        {
+            End();
+            Begin(ms);
+        }
             
         us_begintime = ms * (uint64_t)1000;
         us_start = to_us_since_boot(get_absolute_time());
@@ -46,6 +54,7 @@ namespace uazips
             Event* event = new TimerEvent(self);
             queue_try_add(&Event::event_queue, &event);
             self->us_start = 0;
+            self->End();
         }
         return false;
     }
@@ -57,17 +66,22 @@ namespace uazips
 
     void CountdownTimer::Begin(uint64_t ms)
     {
-        if (id >= 0)
-            return;
+        if ((id >= 0) || is_active)
+        {
+            End();
+            Begin(ms);
+        }
+            
 
         us_begintime = ms * (uint64_t)1000;
         us_start = to_us_since_boot(get_absolute_time());
         id = add_alarm_in_ms(ms, (alarm_callback_t)&TimerCallback, this, false);
+        is_active = true;
     }
 
     void CountdownTimer::End()
     {
-        if (id >= 0)
+        if (id >= 0 || is_active)
         {
             cancel_alarm(id);
             id = -1;

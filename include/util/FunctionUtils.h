@@ -30,7 +30,10 @@ namespace uazips
             {
                 inline bool operator()(const char* a, const char* b) const
                 {
-                    return strcmp(a, b) == 0;
+                    if (a == b) return false;
+                    if (!a) return true;
+                    if (!b) return false;
+                    return strcmp(a, b) < 0;
                 }
             };
         }

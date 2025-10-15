@@ -1,10 +1,5 @@
 #include <event/Event.h>
 #include <ZipsLib.h>
-#include <util/TimeHandler.h>
-
-#if USING_MULTICORE
-#include <pico/multicore.h>
-#endif
 
 namespace uazips
 {
@@ -12,47 +7,21 @@ namespace uazips
     bool Event::is_queue_initialized = false;
     queue_t Event::event_queue = {};
 
-    void Event::HandleAllEvents(bool endless_loop, uint32_t us_debouncing)
+    void Event::HandleAllEvents(bool endless_loop)
     {
         if (endless_loop)
         {
-            if (us_debouncing)
+            while (1)
             {
-                TimeHandler th;
-                uint64_t cumulative = 0;
-                while (1)
+                Event* event;
+                queue_remove_blocking(&event_queue, &event);
+                if (event)
                 {
-                    th.Update();
-                    cumulative += th.DeltaTime;
-                    if (cumulative >= us_debouncing)
-                    {
-                        cumulative -= us_debouncing;
-                        Event* event;
-                        queue_remove_blocking(&event_queue, &event);
-                        if (event)
-                        {
-                            event->HandleEvent();
-                            event->source->Dispatch(event);
-                            delete event;
-                        }
-                    }
+                    event->HandleEvent();
+                    event->source->Dispatch(event);
+                    delete event;
                 }
             }
-            else
-            {
-                while (1)
-                {
-                    Event* event;
-                    queue_remove_blocking(&event_queue, &event);
-                    if (event)
-                    {
-                        event->HandleEvent();
-                        event->source->Dispatch(event);
-                        delete event;
-                    }
-                }
-            }
-            
         }
         else
         {

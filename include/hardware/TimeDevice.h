@@ -21,6 +21,8 @@ namespace uazips
         virtual void Begin(uint64_t ms) = 0;
         virtual void End() = 0;
 
+        virtual void OnRemoveListener() override;
+
         inline uint64_t GetTimeElapsedMicroseconds() const
         {
             return us_elapsed;
@@ -50,6 +52,11 @@ namespace uazips
         inline void UpdateTime()
         {
             us_elapsed = to_us_since_boot(get_absolute_time()) - us_start;
+        }
+
+        inline bool IsActive() const
+        {
+            return is_active;
         }
     };
 

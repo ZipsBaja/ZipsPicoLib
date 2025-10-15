@@ -20,7 +20,8 @@ namespace uazips
         }
 
     public:
-        IODevice(uint8_t gpio_pin)
+        IODevice(uint8_t gpio_pin, uint64_t us_debouncing = 0)
+            : IRQHandler<EventType>(us_debouncing)
         {
             instances[gpio_pin] = this;
             gpio_init(gpio_pin);
