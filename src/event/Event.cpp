@@ -1,8 +1,18 @@
 #include <event/Event.h>
 #include <ZipsLib.h>
 
+#if USING_MULTICORE
+#include <pico/multicore.h>
+#endif
+
 namespace uazips
 {
+#if USING_MULTICORE
+    static void begin_core_1()
+    {
+        Event::HandleAllEvents(true);
+    }
+#endif
 
     bool Event::is_queue_initialized = false;
     queue_t Event::event_queue = {};
@@ -35,6 +45,12 @@ namespace uazips
             }
         }
     }
+#if USING_MULTICORE
+    void Event::BeginThread()
+    {
+        multicore_launch_core1(&begin_core_1);
+    }
+#endif
 
     Event::Event(EventSourceBase* source)
         : source(source)

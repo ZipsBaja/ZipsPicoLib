@@ -56,6 +56,11 @@ namespace uazips
             queue_free(&action_queue);
         }
 
+        inline size_t GetListenerCount() const
+        {
+            return listeners.size();
+        }
+
         // Override to force action upon adding a callback.
         virtual void OnAddListener() {}
         // Override to force action upon removing a callback.
@@ -243,6 +248,11 @@ namespace uazips
         // If mutlicore is enabled, ideally set-up your devices in the second core and call this line to poll them.
         // @param endless_loop Begin a while (true) loop
         static void HandleAllEvents(bool endless_loop);
+
+#if USING_MULTICORE 
+        // Will begin the thread to handle events repeatedly.
+        static void BeginThread();
+#endif
 
     public:
         Event(EventSourceBase* source);
