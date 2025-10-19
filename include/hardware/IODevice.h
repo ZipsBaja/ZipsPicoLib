@@ -10,6 +10,7 @@ namespace uazips
     {
     protected:
         uint8_t gpio_pin;
+        gpio_irq_level level;
         
         static IRQHandler<EventType>* instances[PICO_TOTAL_GPIO_PINS];
         
@@ -20,30 +21,30 @@ namespace uazips
         }
 
     public:
-        IODevice(uint8_t gpio_pin, uint64_t us_debouncing = 0)
-            : IRQHandler<EventType>(us_debouncing)
+        IODevice(uint8_t gpio_pin, gpio_irq_level level, uint64_t us_debouncing = 0)
+            : IRQHandler<EventType>(us_debouncing), gpio_pin(gpio_pin), level(level)
         {
             instances[gpio_pin] = this;
             gpio_init(gpio_pin);
             gpio_set_dir(gpio_pin, GPIO_IN);
             gpio_pull_down(gpio_pin);
 
-            gpio_set_irq_enabled_with_callback(gpio_pin, GPIO_IRQ_EDGE_RISE, true, (gpio_irq_callback_t)&GPIODispatch);
+            gpio_set_irq_enabled_with_callback(gpio_pin, level, true, (gpio_irq_callback_t)&GPIODispatch);
         }   
         virtual ~IODevice()
         {
             instances[gpio_pin] = nullptr;
-            gpio_set_irq_enabled_with_callback(gpio_pin, GPIO_IRQ_EDGE_RISE, false, nullptr);
+            gpio_set_irq_enabled_with_callback(gpio_pin, level, false, nullptr);
         }
 
         virtual void Enable() override
         {
-            gpio_set_irq_enabled_with_callback(gpio_pin, GPIO_IRQ_EDGE_RISE, true, (gpio_irq_callback_t)&GPIODispatch);
+            gpio_set_irq_enabled_with_callback(gpio_pin, level, true, (gpio_irq_callback_t)&GPIODispatch);
         }
 
         virtual void Disable() override
         {
-            gpio_set_irq_enabled_with_callback(gpio_pin, GPIO_IRQ_EDGE_RISE, false, nullptr);
+            gpio_set_irq_enabled_with_callback(gpio_pin, level, false, nullptr);
         }
 
         inline uint8_t GetPin() const
