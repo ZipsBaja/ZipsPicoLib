@@ -10,7 +10,7 @@ namespace uazips
     {
     protected:
         uint8_t gpio_pin;
-        gpio_irq_level level;
+        uint32_t level_mask;
         
         static IRQHandler<EventType>* instances[PICO_TOTAL_GPIO_PINS];
         
@@ -21,30 +21,36 @@ namespace uazips
         }
 
     public:
-        IODevice(uint8_t gpio_pin, gpio_irq_level level, uint64_t us_debouncing = 0)
-            : IRQHandler<EventType>(us_debouncing), gpio_pin(gpio_pin), level(level)
+        IODevice(uint8_t gpio_pin, uint32_t level_mask, uint64_t us_debouncing = 0)
+            : IRQHandler<EventType>(us_debouncing), gpio_pin(gpio_pin), level_mask(level_mask)
         {
             instances[gpio_pin] = this;
             gpio_init(gpio_pin);
             gpio_set_dir(gpio_pin, GPIO_IN);
             gpio_pull_down(gpio_pin);
 
-            gpio_set_irq_enabled_with_callback(gpio_pin, level, true, (gpio_irq_callback_t)&GPIODispatch);
-        }   
+            gpio_set_irq_enabled_with_callback(gpio_pin, level_mask, true, (gpio_irq_callback_t)&GPIODispatch);
+        }  
+        
+        IODevice(uint8_t gpio_pin, gpio_irq_level level, uint64_t us_debouncing = 0)
+            : IODevice(gpio_pin, (uint32_t)level, us_debouncing)
+        {
+        }
+        
         virtual ~IODevice()
         {
             instances[gpio_pin] = nullptr;
-            gpio_set_irq_enabled_with_callback(gpio_pin, level, false, nullptr);
+            gpio_set_irq_enabled_with_callback(gpio_pin, level_mask, false, nullptr);
         }
 
         virtual void Enable() override
         {
-            gpio_set_irq_enabled_with_callback(gpio_pin, level, true, (gpio_irq_callback_t)&GPIODispatch);
+            gpio_set_irq_enabled_with_callback(gpio_pin, level_mask, true, (gpio_irq_callback_t)&GPIODispatch);
         }
 
         virtual void Disable() override
         {
-            gpio_set_irq_enabled_with_callback(gpio_pin, level, false, nullptr);
+            gpio_set_irq_enabled_with_callback(gpio_pin, level_mask, false, nullptr);
         }
 
         inline uint8_t GetPin() const
