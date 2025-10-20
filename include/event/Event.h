@@ -271,20 +271,28 @@ namespace uazips
     {
     protected:
         uint8_t gpio_pin;
+        uint32_t events_mask;
 
     public:
-        inline GPIOEvent(EventSourceBase* source, uint8_t gpio_pin) : Event(source) {};
+        inline GPIOEvent(EventSourceBase* source, uint8_t gpio_pin, uint32_t events_mask)
+            : Event(source), gpio_pin(gpio_pin), events_mask(events_mask) {};
 
         inline uint8_t GetPin() const
         {
             return gpio_pin;
+        }
+
+        inline uint32_t GetEventMask() const
+        {
+            return events_mask;
         }
     };
 
     class ButtonEvent : public GPIOEvent
     {
     public:
-        inline ButtonEvent(EventSourceBase* source, uint8_t gpio_pin) : GPIOEvent(source, gpio_pin) {}
+        inline ButtonEvent(EventSourceBase* source, uint8_t gpio_pin, uint32_t events_mask)
+            : GPIOEvent(source, gpio_pin, events_mask) {}
     };
 
     class TimerEvent : public Event
