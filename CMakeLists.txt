@@ -3,6 +3,7 @@ add_library(ZipsPicoLib STATIC
     src/event/Event.cpp
     src/hardware/Button.cpp
     src/hardware/TimeDevice.cpp
+    src/hardware/DualActionSensor.cpp
 )
 
 target_include_directories(ZipsPicoLib PUBLIC

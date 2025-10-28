@@ -80,7 +80,10 @@ namespace uazips
             OnRemoveListener();
             listeners_map.erase(listener_name);
             listeners.erase(std::remove_if(listeners.begin(), listeners.end(), [&listener_name](const char* s){
-                return strcmp(s, listener_name) == 0;
+                if (s == listener_name) return false;
+                if (!s) return true;
+                if (!listener_name) return false;
+                return strcmp(s, listener_name) < 0;
             }));
             return listener_name;
         }
@@ -141,8 +144,7 @@ namespace uazips
             static constexpr char disjunc1[] = "__disjunc1__";
             static constexpr char disjunc2[] = "__disjunc2__";
 
-            AddListener(disjunction_name, [&](const EventType* event){
-                listener(event);
+            return AddListener(disjunction_name, [&](const EventType* event){
                 source1.AddListener(disjunc1, [&](const EventType1* ev){
                     if (listeners_map.contains(advance_listener))
                     {
@@ -167,13 +169,13 @@ namespace uazips
                     source1.RemoveListener(disjunc1);
                     source2.RemoveListener(disjunc2);
                 });
+                listener(event);
             });
-            return disjunction_name;
         }
 
         // Creates a listener that takes one EventSource object to call one action
         // or a different action depending on if the current source is fired first, or the other.
-        // Useful for creatin confirmation messages.
+        // Useful for creating confirmation messages.
         template<class EventType1>
         const char* AddDisjunctionListener(const char* disjunction_name, const char* advance_listener, const char* fallback_listener,
             EventSource<EventType1>& other_source, const EventListener& listener)
@@ -181,8 +183,7 @@ namespace uazips
             static constexpr char disjunc1[] = "__disjunc1__";
             static constexpr char disjunc2[] = "__disjunc2__";
 
-            AddListener(disjunction_name, [&](const EventType* event){
-                listener(event);
+            return AddListener(disjunction_name, [&](const EventType* event){
                 AddListener(disjunc1, [&](const EventType* ev){
                     if (listeners_map.contains(advance_listener))
                     {
@@ -207,8 +208,8 @@ namespace uazips
                     RemoveListener(disjunc1);
                     other_source.RemoveListener(disjunc2);
                 });
+                listener(event);
             });
-            return disjunction_name;
         }
 
     };
