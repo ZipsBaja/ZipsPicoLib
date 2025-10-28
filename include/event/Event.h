@@ -39,8 +39,14 @@ namespace uazips
     public:
         using EventListener = std::function<void(const EventType*)>;
 
+        struct ListenerProperties
+        {
+            EventListener listener;
+            bool autonomous;
+        };
+
     protected:
-        std::map<const char*, EventListener, functionutils::predicates::CStringCompare> listeners_map;
+        std::map<const char*, ListenerProperties, functionutils::predicates::CStringCompare> listeners_map;
         std::vector<const char*> listeners;
         queue_t action_queue; // Accepts c strings
         EventDispatchSystem event_system;
@@ -70,10 +76,13 @@ namespace uazips
         virtual void OnRemoveListener() {}
 
         // Adds an action to be called when the event is fired.
-        inline const char* AddListener(const char* listener_name, const EventListener& listener)
+        inline const char* AddListener(const char* listener_name, const EventListener& listener, bool is_autonomous = true)
         {
             OnAddListener();
-            listeners_map.emplace(listener_name, listener);
+            ListenerProperties prop;
+            prop.listener = listener;
+            prop.autonomous = is_autonomous;
+            listeners_map.emplace(listener_name, prop);
             listeners.push_back(listener_name);
             return listener_name;
         }
@@ -93,14 +102,14 @@ namespace uazips
 
         // Anonymous version; its time of creation is used as its identifier.
         // I do not want to wrap the return in a smart pointer... so delete it.
-        inline const char* AddListener(const EventListener& listener)
+        inline const char* AddListener(const EventListener& listener, bool is_autonomous = true)
         {
             char buff[9];
             memset(buff, '\0', 9);
             snprintf(buff, 8, "%llu", to_us_since_boot(get_absolute_time()));
             char* out = new char[strlen(buff) + 1];
             strcpy(out, buff);
-            AddListener(out, listener);
+            AddListener(out, listener, is_autonomous);
             return out;
         }
 
@@ -113,15 +122,30 @@ namespace uazips
                 {
                     for (auto& [key, value] : listeners_map)
                     {
-                        value(eventptr);
+                        if (value.autonomous)
+                            value.listener(eventptr);
                     }
                     break;
                 }
                 case CYCLE:
                 {
-                    listeners_map[listeners[cycle_index++]](eventptr);
-                    if (cycle_index >= listeners.size())
-                        cycle_index = 0;
+                    ListenerProperties prop;
+                    prop.autonomous = false;
+
+                    size_t total_checks = 0;
+                    while (!prop.autonomous)
+                    {
+                        prop = listeners_map[listeners[cycle_index++]];
+                        if (cycle_index >= listeners.size())
+                        {
+                            cycle_index = 0;
+                        }
+                        if (total_checks++ >= listeners.size())
+                        {
+                            return;
+                        }
+                    }
+                    prop.listener(eventptr);
                     break;
                 }
             }
@@ -148,7 +172,7 @@ namespace uazips
                 source1.AddListener(name_disjunc1, [&](const EventType1* ev){
                     if (listeners_map.contains(advance_listener))
                     {
-                        listeners_map[advance_listener](event);
+                        listeners_map[advance_listener].listener(event);
                         auto it = std::find(listeners.begin(), listeners.end(), advance_listener);
                         // Set index to the next action after what was taken from queue.
                         if (it != listeners.end())
@@ -160,7 +184,7 @@ namespace uazips
                 source2.AddListener(name_disjunc2, [&](const EventType2* ev){
                     if (listeners_map.contains(fallback_listener))
                     {
-                        listeners_map[fallback_listener](event);
+                        listeners_map[fallback_listener].listener(event);
                         auto it = std::find(listeners.begin(), listeners.end(), fallback_listener);
                         // Set index to the next action after what was taken from queue.
                         if (it != listeners.end())
@@ -184,7 +208,7 @@ namespace uazips
                 AddListener(name_disjunc1, [&](const EventType* ev){
                     if (listeners_map.contains(advance_listener))
                     {
-                        listeners_map[advance_listener](event);
+                        listeners_map[advance_listener].listener(event);
                         auto it = std::find(listeners.begin(), listeners.end(), advance_listener);
                         // Set index to the next action after what was taken from queue.
                         if (it != listeners.end())
@@ -196,7 +220,7 @@ namespace uazips
                 other_source.AddListener(name_disjunc2, [&](const EventType1* ev){
                     if (listeners_map.contains(fallback_listener))
                     {
-                        listeners_map[fallback_listener](event);
+                        listeners_map[fallback_listener].listener(event);
                         auto it = std::find(listeners.begin(), listeners.end(), fallback_listener);
                         // Set index to the next action after what was taken from queue.
                         if (it != listeners.end())

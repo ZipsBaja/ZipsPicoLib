@@ -5,7 +5,7 @@
 namespace uazips
 {
 
-    class DualActionSensor : IODevice<GPIOEvent>
+    class DualActionSensor : public IODevice<GPIOEvent>
     {
     public:
         DualActionSensor(uint8_t gpio_pin);
@@ -21,7 +21,7 @@ namespace uazips
                 source1.AddListener(name_disjunc1, [&](const EventType1* ev){
                     if (listeners_map.contains(advance_listener))
                     {
-                        listeners_map[advance_listener](event);
+                        listeners_map[advance_listener].listener(event);
                         auto it = std::find(listeners.begin(), listeners.end(), advance_listener);
                         // Set index to the next action after what was taken from queue.
                         if (it != listeners.end())
@@ -33,7 +33,7 @@ namespace uazips
                 source2.AddListener(name_disjunc2, [&](const EventType2* ev){
                     if (listeners_map.contains(fallback_listener))
                     {
-                        listeners_map[fallback_listener](event);
+                        listeners_map[fallback_listener].listener(event);
                         auto it = std::find(listeners.begin(), listeners.end(), fallback_listener);
                         // Set index to the next action after what was taken from queue.
                         if (it != listeners.end())
@@ -54,7 +54,7 @@ namespace uazips
                 source1.AddListener(name_disjunc1, [&](const EventType1* ev){
                     if (listeners_map.contains(advance_listener))
                     {
-                        listeners_map[advance_listener](event);
+                        listeners_map[advance_listener].listener(event);
                         auto it = std::find(listeners.begin(), listeners.end(), advance_listener);
                         // Set index to the next action after what was taken from queue.
                         if (it != listeners.end())
@@ -66,7 +66,7 @@ namespace uazips
                 source2.AddListener(name_disjunc2, [&](const EventType2* ev){
                     if (listeners_map.contains(fallback_listener))
                     {
-                        listeners_map[fallback_listener](event);
+                        listeners_map[fallback_listener].listener(event);
                         auto it = std::find(listeners.begin(), listeners.end(), fallback_listener);
                         // Set index to the next action after what was taken from queue.
                         if (it != listeners.end())
@@ -87,7 +87,7 @@ namespace uazips
                 AddListener(name_disjunc1, [&](const EventType* ev){
                     if (listeners_map.contains(advance_listener))
                     {
-                        listeners_map[advance_listener](event);
+                        listeners_map[advance_listener].listener(event);
                         auto it = std::find(listeners.begin(), listeners.end(), advance_listener);
                         // Set index to the next action after what was taken from queue.
                         if (it != listeners.end())
@@ -99,7 +99,7 @@ namespace uazips
                 other_source.AddListener(name_disjunc2, [&](const EventType* ev){
                     if (listeners_map.contains(fallback_listener))
                     {
-                        listeners_map[fallback_listener](event);
+                        listeners_map[fallback_listener].listener(event);
                         auto it = std::find(listeners.begin(), listeners.end(), fallback_listener);
                         // Set index to the next action after what was taken from queue.
                         if (it != listeners.end())
@@ -120,7 +120,7 @@ namespace uazips
                 AddListener(name_disjunc1, [&](const EventType* ev){
                     if (listeners_map.contains(advance_listener))
                     {
-                        listeners_map[advance_listener](event);
+                        listeners_map[advance_listener].listener(event);
                         auto it = std::find(listeners.begin(), listeners.end(), advance_listener);
                         // Set index to the next action after what was taken from queue.
                         if (it != listeners.end())
@@ -132,7 +132,7 @@ namespace uazips
                 other_source.AddListener(name_disjunc2, [&](const EventType* ev){
                     if (listeners_map.contains(fallback_listener))
                     {
-                        listeners_map[fallback_listener](event);
+                        listeners_map[fallback_listener].listener(event);
                         auto it = std::find(listeners.begin(), listeners.end(), fallback_listener);
                         // Set index to the next action after what was taken from queue.
                         if (it != listeners.end())
