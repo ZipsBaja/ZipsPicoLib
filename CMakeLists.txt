@@ -14,5 +14,5 @@ target_link_libraries(ZipsPicoLib
     pico_stdlib
     hardware_irq
     hardware_timer
-    $<IF:${USE_MULTICORE_CMAKE},pico_multicore,>
+    pico_multicore
 )

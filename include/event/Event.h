@@ -46,6 +46,9 @@ namespace uazips
         EventDispatchSystem event_system;
         size_t cycle_index;
 
+        static constexpr char name_disjunc1[] = "__disjunc1__";
+        static constexpr char name_disjunc2[] = "__disjunc2__";
+
     public:
         inline EventSource() : event_system(EventDispatchSystem::ALL), cycle_index(0)
         {
@@ -141,11 +144,8 @@ namespace uazips
         const char* AddDisjunctionListener(const char* disjunction_name, const char* advance_listener, const char* fallback_listener,
             EventSource<EventType1>& source1, EventSource<EventType2>& source2, const EventListener& listener)
         {
-            static constexpr char disjunc1[] = "__disjunc1__";
-            static constexpr char disjunc2[] = "__disjunc2__";
-
             return AddListener(disjunction_name, [&](const EventType* event){
-                source1.AddListener(disjunc1, [&](const EventType1* ev){
+                source1.AddListener(name_disjunc1, [&](const EventType1* ev){
                     if (listeners_map.contains(advance_listener))
                     {
                         listeners_map[advance_listener](event);
@@ -154,10 +154,10 @@ namespace uazips
                         if (it != listeners.end())
                             cycle_index = it - listeners.begin() + 1;
                     }
-                    source1.RemoveListener(disjunc1);
-                    source2.RemoveListener(disjunc2);
+                    source1.RemoveListener(name_disjunc1);
+                    source2.RemoveListener(name_disjunc2);
                 });
-                source2.AddListener(disjunc2, [&](const EventType2* ev){
+                source2.AddListener(name_disjunc2, [&](const EventType2* ev){
                     if (listeners_map.contains(fallback_listener))
                     {
                         listeners_map[fallback_listener](event);
@@ -166,8 +166,8 @@ namespace uazips
                         if (it != listeners.end())
                             cycle_index = it - listeners.begin() + 1;
                     }
-                    source1.RemoveListener(disjunc1);
-                    source2.RemoveListener(disjunc2);
+                    source1.RemoveListener(name_disjunc1);
+                    source2.RemoveListener(name_disjunc2);
                 });
                 listener(event);
             });
@@ -180,11 +180,8 @@ namespace uazips
         const char* AddDisjunctionListener(const char* disjunction_name, const char* advance_listener, const char* fallback_listener,
             EventSource<EventType1>& other_source, const EventListener& listener)
         {
-            static constexpr char disjunc1[] = "__disjunc1__";
-            static constexpr char disjunc2[] = "__disjunc2__";
-
             return AddListener(disjunction_name, [&](const EventType* event){
-                AddListener(disjunc1, [&](const EventType* ev){
+                AddListener(name_disjunc1, [&](const EventType* ev){
                     if (listeners_map.contains(advance_listener))
                     {
                         listeners_map[advance_listener](event);
@@ -193,10 +190,10 @@ namespace uazips
                         if (it != listeners.end())
                             cycle_index = it - listeners.begin() + 1;
                     }
-                    RemoveListener(disjunc1);
-                    other_source.RemoveListener(disjunc2);
+                    RemoveListener(name_disjunc1);
+                    other_source.RemoveListener(name_disjunc2);
                 });
-                other_source.AddListener(disjunc2, [&](const EventType1* ev){
+                other_source.AddListener(name_disjunc2, [&](const EventType1* ev){
                     if (listeners_map.contains(fallback_listener))
                     {
                         listeners_map[fallback_listener](event);
@@ -205,8 +202,8 @@ namespace uazips
                         if (it != listeners.end())
                             cycle_index = it - listeners.begin() + 1;
                     }
-                    RemoveListener(disjunc1);
-                    other_source.RemoveListener(disjunc2);
+                    RemoveListener(name_disjunc1);
+                    other_source.RemoveListener(name_disjunc2);
                 });
                 listener(event);
             });
