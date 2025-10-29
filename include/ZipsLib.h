@@ -13,12 +13,14 @@
 #define consteval constexpr
 #endif
 
+#if __cplusplus >= 201703L
+#define NODISCARD [[nodiscard]]
+#else
+#define NODISCARD
+#endif
+
 #if defined(USING_PICO_W) || defined(USING_PICO_2_W)
 #include <pico/cyw43_arch.h>
-// A macro used ONLY for intellisense to remove errors.
-#ifdef VSCODE_INTELLISENSE
-#include <pico_w.h>
-#endif
 #endif
 
 // Change these to zero or one depending on the use case!

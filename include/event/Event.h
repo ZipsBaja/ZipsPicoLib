@@ -1,10 +1,10 @@
 #pragma once
 
+#include <ZipsLib.h>
+
 #include <util/TypeUtils.h>
 #include <util/FunctionUtils.h>
 
-#include <stdio.h>
-#include <stdint.h>
 #include <cstddef>
 #include <map>
 #include <vector>
@@ -76,7 +76,7 @@ namespace uazips
         virtual void OnRemoveListener() {}
 
         // Adds an action to be called when the event is fired.
-        inline const char* AddListener(const char* listener_name, const EventListener& listener, bool is_autonomous = true)
+        const char* AddListener(const char* listener_name, const EventListener& listener, bool is_autonomous = true)
         {
             OnAddListener();
             ListenerProperties prop;
@@ -87,7 +87,7 @@ namespace uazips
             return listener_name;
         }
         // Removes an action from being called when the event is fired.
-        inline const char* RemoveListener(const char* listener_name)
+        const char* RemoveListener(const char* listener_name)
         {
             OnRemoveListener();
             listeners_map.erase(listener_name);
@@ -102,7 +102,7 @@ namespace uazips
 
         // Anonymous version; its time of creation is used as its identifier.
         // I do not want to wrap the return in a smart pointer... so delete it.
-        inline const char* AddListener(const EventListener& listener, bool is_autonomous = true)
+        NODISCARD const char* AddListener(const EventListener& listener, bool is_autonomous = true)
         {
             char buff[9];
             memset(buff, '\0', 9);
@@ -111,6 +111,26 @@ namespace uazips
             strcpy(out, buff);
             AddListener(out, listener, is_autonomous);
             return out;
+        }
+
+        inline const char* AddHiddenListener(const char* name, const EventListener& listener)
+        {
+            return AddListener(name, listener, false);
+        }
+
+        inline const char* AddHiddenListener(const EventListener& listener)
+        {
+            return AddListener(listener, false);
+        }
+
+        bool SetListenerVisibility(const char* name, bool visibility)
+        {
+            if (listeners_map.contains(name))
+            {
+                listeners_map[name].autonomous = visibility;
+                return true;
+            }
+            return false;
         }
 
         void Dispatch(const void* event) override

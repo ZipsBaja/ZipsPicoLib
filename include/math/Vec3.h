@@ -164,19 +164,19 @@ namespace uazips
 
         inline Vec3 Rotate(const Vec3& Rotation, bool in_degrees = 0)
         {
-            Vec3 radians_half = (in_degrees ? Rotation.ToRadians() : Rotation) * (D)0.5;
+            Vec3 radians_half = (in_degrees ? Rotation.ToRadians() : Rotation) * 0.5;
 
-            D croll = std::cos(radians_half.x), sroll = std::sin(radians_half.x);
-            D cpitch = std::cos(radians_half.y), spitch = std::sin(radians_half.y);
-            D cyaw = std::cos(radians_half.z), syaw = std::sin(radians_half.z);
+            double croll = std::cos(radians_half.x), sroll = std::sin(radians_half.x);
+            double cpitch = std::cos(radians_half.y), spitch = std::sin(radians_half.y);
+            double cyaw = std::cos(radians_half.z), syaw = std::sin(radians_half.z);
             
-            D w = croll*cpitch*cyaw + sroll*spitch*syaw;
-            D x = sroll*cpitch*cyaw - croll*spitch*syaw;
-            D y = croll*spitch*cyaw + sroll*cpitch*syaw;
-            D z = croll*cpitch*syaw - sroll*spitch*cyaw;
+            double w = croll*cpitch*cyaw + sroll*spitch*syaw;
+            double x = sroll*cpitch*cyaw - croll*spitch*syaw;
+            double y = croll*spitch*cyaw + sroll*cpitch*syaw;
+            double z = croll*cpitch*syaw - sroll*spitch*cyaw;
 
             Vec3 quat_vec = {x, y, z};
-            Vec3 t = Cross(quat_vec) * (D)-2.0;
+            Vec3 t = Cross(quat_vec) * -2.0;
             
             return *this + (t * w) + quat_vec.Cross(t);
         }
