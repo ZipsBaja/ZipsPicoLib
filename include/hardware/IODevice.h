@@ -28,6 +28,7 @@ namespace uazips
             gpio_init(gpio_pin);
             gpio_set_dir(gpio_pin, GPIO_IN);
             gpio_pull_down(gpio_pin);
+            gpio_pull
 
             gpio_set_irq_enabled_with_callback(gpio_pin, level_mask, true, (gpio_irq_callback_t)&GPIODispatch);
         }  

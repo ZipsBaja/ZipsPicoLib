@@ -6,6 +6,7 @@ namespace uazips
     DualActionSensor::DualActionSensor(uint8_t gpio_pin)
         : IODevice<GPIOEvent>(gpio_pin, GPIO_IRQ_EDGE_FALL | GPIO_IRQ_EDGE_RISE)
     {
+        gpio_pull_up(gpio_pin);
     }
 
     const char* DualActionSensor::AddEdgeRiseListener(const char* name, const EventListener& action)
