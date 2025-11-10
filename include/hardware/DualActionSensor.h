@@ -84,7 +84,7 @@ namespace uazips
             EventSource<EventType>& other_source, const EventListener& listener)
         {
             return AddEdgeRiseListener(disjunction_name, [&](const GPIOEvent* event){
-                AddListener(name_disjunc1, [&](const EventType* ev){
+                AddListener(name_disjunc1, [&](const GPIOEvent* ev){
                     if (listeners_map.contains(advance_listener))
                     {
                         listeners_map[advance_listener].listener(event);
@@ -117,7 +117,7 @@ namespace uazips
             EventSource<EventType>& other_source, const EventListener& listener)
         {
             return AddEdgeFallListener(disjunction_name, [&](const GPIOEvent* event){
-                AddListener(name_disjunc1, [&](const EventType* ev){
+                AddListener(name_disjunc1, [&](const GPIOEvent* ev){
                     if (listeners_map.contains(advance_listener))
                     {
                         listeners_map[advance_listener].listener(event);
