@@ -1,18 +1,17 @@
 add_library(ZipsPicoLib STATIC
-    src/StaticDefines.cpp
-    src/event/Event.cpp
-    src/hardware/Button.cpp
-    src/hardware/TimeDevice.cpp
-    src/hardware/DualActionSensor.cpp
+    src/util/TimeHandler.cpp
+    src/util/VirtualMultiplexer.cpp
 )
 
 target_include_directories(ZipsPicoLib PUBLIC
     include
 )
 
+add_subdirectory(lib/pico-event-hardware)
+add_subdirectory(lib/pico-math)
+
 target_link_libraries(ZipsPicoLib
     pico_stdlib
-    hardware_irq
-    hardware_timer
-    pico_multicore
+    pico-event-hardware
+    pico-math
 )

@@ -3,40 +3,34 @@
 #include <string.h>
 #include <functional>
 
-namespace uazips
+namespace functionutils
 {
-
-    namespace functionutils
+    // Functions that decide whether loops are broken out of.
+    // A return of true breaks out the loop, and a return of false stays in the loop.
+    namespace breakfunctions
     {
-        // Functions that decide whether loops are broken out of.
-        // A return of true breaks out the loop, and a return of false stays in the loop.
-        namespace breakfunctions
+        template<typename T>
+        constexpr inline bool ignore(T)
         {
-            template<typename T>
-            constexpr inline bool ignore(T)
-            {
-                return false;
-            }
-            template<typename T>
-            constexpr inline bool abort(T)
-            {
-                return true;
-            }
+            return false;
         }
-
-        namespace predicates
+        template<typename T>
+        constexpr inline bool abort(T)
         {
-            struct CStringCompare
-            {
-                inline bool operator()(const char* a, const char* b) const
-                {
-                    if (a == b) return false;
-                    if (!a) return true;
-                    if (!b) return false;
-                    return strcmp(a, b) < 0;
-                }
-            };
+            return true;
         }
     }
-
+    namespace predicates
+    {
+        struct CStringCompare
+        {
+            inline bool operator()(const char* a, const char* b) const
+            {
+                if (a == b) return false;
+                if (!a) return true;
+                if (!b) return false;
+                return strcmp(a, b) < 0;
+            }
+        };
+    }
 }

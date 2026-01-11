@@ -1,0 +1,6 @@
+[submodule "lib/pico-event-hardware"]
+	path = lib/pico-event-hardware
+	url = https://github.com/zyoung71/pico-event-hardware
+[submodule "lib/pico-math"]
+	path = lib/pico-math
+	url = https://github.com/zyoung71/pico-math
