@@ -1,7 +1,6 @@
 if (NOT TARGET ZipsPicoLib)
 
     add_library(ZipsPicoLib STATIC
-        src/util/TimeHandler.cpp
         src/util/VirtualMultiplexer.cpp
     )
     
