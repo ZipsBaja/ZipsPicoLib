@@ -1,7 +1,6 @@
 if (NOT TARGET ZipsPicoLib)
 
     add_library(ZipsPicoLib STATIC
-        src/util/VirtualMultiplexer.cpp
     )
     
     target_include_directories(ZipsPicoLib PUBLIC

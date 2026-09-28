@@ -19,6 +19,10 @@
 #define NODISCARD
 #endif
 
+#ifdef __cplusplus
+#define restrict __restrict
+#endif
+
 #if defined(USING_PICO_W) || defined(USING_PICO_2_W)
 #include <pico/cyw43_arch.h>
 #endif
